@@ -49,6 +49,7 @@ public class AuthorizationController {
 					data.getUserMoney(),
 					data.getUserRank().BRONZEI.name(),
 					data.getUserRole().ALUNO.name());
+		
 					
 		}
 				
