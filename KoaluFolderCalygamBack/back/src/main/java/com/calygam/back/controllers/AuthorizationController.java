@@ -1,13 +1,12 @@
 package com.calygam.back.controllers;
 
-import java.math.BigInteger;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -36,7 +35,12 @@ public class AuthorizationController {
 	
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> CreateOneNewUserInMyBase(@RequestBody RegisterDTO data)throws Exception{
+	public ResponseEntity<?> CreateOneNewUserInMyBase(@Valid @RequestBody RegisterDTO data, BindingResult result)throws Exception{
+	    if (result.hasErrors()) {
+	        
+	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage());
+	    }
+		try {
 		if(service.userExistentInMyBaseService(data.getUserEmail(),data.getUserCpf())) {
 			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já está cadastrado!");
 		}else {
@@ -46,7 +50,7 @@ public class AuthorizationController {
 					data.getUserName(),
 					data.getUserEmail(),
 					encrypitedPassword,
-					data.getUserTelefone(),
+
 					data.getUserCpf(),
 					
 					data.getUserRank().BRONZEI.name(),
@@ -54,6 +58,11 @@ public class AuthorizationController {
 		
 					
 		}
+		}
+		catch(Exception e) {
+			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+		}
+	
 				
 	}
 	@PostMapping("/login")

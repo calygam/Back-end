@@ -17,7 +17,7 @@ public class UserServices {
 		return repo.userExistentInMyBase(email, Cpf);
 	}
 	
-	public ResponseEntity<?> CreateOneNewUserInMyBaseService(String userName,String userEmail,String userHashPassword,String userTelefone,String userCpf,String userRank,String userRole)throws Exception{
-		return repo.CreateOneNewUserInMyBase(userName, userEmail, userHashPassword, userTelefone, userCpf, userRank, userRole);
+	public ResponseEntity<?> CreateOneNewUserInMyBaseService(String userName,String userEmail,String userHashPassword,String userCpf,String userRank,String userRole)throws Exception{
+		return repo.CreateOneNewUserInMyBase(userName, userEmail, userHashPassword, userCpf, userRank, userRole);
 	}
 }

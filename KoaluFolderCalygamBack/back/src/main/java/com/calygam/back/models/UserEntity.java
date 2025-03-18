@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Collection;
 import java.util.List;
 
+import org.hibernate.validator.constraints.NotBlank;
+import org.hibernate.validator.constraints.br.CPF;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -20,6 +22,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotNull;
 
 @Entity(name = "tb_users")
 @Table(name = "tb_users")
@@ -32,13 +35,14 @@ public class UserEntity implements UserDetails {
 	@Column(name = "user_google_id")
 	private String userGoogleId;
 	
-	@Column(name="user_name")
+	@Column(name="user_name",nullable = false)
 	private String userName;
 	
 	
 	
-	@Column(name="user_email")
-	@Email
+	@Column(name="user_email", nullable = false)
+	@NotBlank(message="Email Vázio não aceito!")
+	@Email(message="caligam<- Email Inválido!")
 	private String userEmail;
 	
 	@Column(name="user_password")
@@ -52,7 +56,8 @@ public class UserEntity implements UserDetails {
 	@Column(name="user_telefone")
 	private String userTelefone;
 	
-	@Column(name="user_cpf")
+	@Column(name="user_cpf",nullable=false)
+	@CPF(message="calygam<- CPF inválido")
 	private String userCpf;
 	
 	@Column(name="user_money")
@@ -82,9 +87,13 @@ public class UserEntity implements UserDetails {
 		super();
 	}
 
-	public UserEntity(Integer userId, String userGoogleId, String userName, @Email String userEmail,
-			String userPassword, String userImageParfil, String userTelefone, String userCpf, BigInteger userMoney,
-			Integer xp, UserRankEnum userRank, UserRoleEnum userRole) {
+
+
+	public UserEntity(Integer userId, String userGoogleId, String userName,
+			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
+			String userPassword, String userImageParfil, String userTelefone,
+			@CPF(message = "calygam<- CPF inválido") String userCpf, BigInteger userMoney, Integer xp,
+			UserRankEnum userRank, UserRoleEnum userRole) {
 		super();
 		this.userId = userId;
 		this.userGoogleId = userGoogleId;
@@ -99,6 +108,8 @@ public class UserEntity implements UserDetails {
 		this.userRank = userRank;
 		this.userRole = userRole;
 	}
+
+
 
 	public Integer getUserId() {
 		return userId;

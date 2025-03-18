@@ -2,25 +2,44 @@ package com.calygam.back.dtos;
 
 import java.math.BigInteger;
 
+import org.hibernate.validator.constraints.br.CPF;
+
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 
+import jakarta.validation.constraints.Email;
+import jakarta.validation.constraints.NotBlank;
+import jakarta.validation.constraints.Pattern;
+
 public class RegisterDTO {
-	private String userName;
-	private String userEmail;
-	private String userPassword;
-	private String userTelefone;
-	private String userCpf;
+    @NotBlank(message = "Nome não pode estar vazio!")
+    private String userName;
+
+    @NotBlank(message = "Email não pode estar vazio!")
+    @Email(message = "Email inválido!")
+    private String userEmail;
+
+    @NotBlank(message = "Senha não pode estar vazia!")
+    private String userPassword;
+
+
+    @NotBlank(message = "CPF não pode estar vazio!")
+    @CPF(message = "CPF inválido!")
+    private String userCpf;
+    
 	private BigInteger userMoney;
 	private UserRankEnum userRank;
 	private UserRoleEnum userRole;
-	public RegisterDTO(String userName, String userEmail, String userPassword, String userTelefone, String userCpf,
+
+	public RegisterDTO(@NotBlank(message = "Nome não pode estar vazio!") String userName,
+			@NotBlank(message = "Email não pode estar vazio!") @Email(message = "Email inválido!") String userEmail,
+			@NotBlank(message = "Senha não pode estar vazia!") String userPassword,
+			@NotBlank(message = "CPF não pode estar vazio!") @CPF(message = "CPF inválido!") String userCpf,
 			BigInteger userMoney, UserRankEnum userRank, UserRoleEnum userRole) {
 		super();
 		this.userName = userName;
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
-		this.userTelefone = userTelefone;
 		this.userCpf = userCpf;
 		this.userMoney = userMoney;
 		this.userRank = userRank;
@@ -44,12 +63,7 @@ public class RegisterDTO {
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
-	public String getUserTelefone() {
-		return userTelefone;
-	}
-	public void setUserTelefone(String userTelefone) {
-		this.userTelefone = userTelefone;
-	}
+
 	public String getUserCpf() {
 		return userCpf;
 	}

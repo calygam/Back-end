@@ -51,20 +51,19 @@ public class UserRepository {
 	
 	//caio<- registrando um novo usuário, com os dados fornecidos pela authorizationController
 	
-	public ResponseEntity<?> CreateOneNewUserInMyBase(String userName,String userEmail,String userHashPassword,String userTelefone,String userCpf,String userRank,String userRole)throws Exception{
+	public ResponseEntity<?> CreateOneNewUserInMyBase(String userName,String userEmail,String userHashPassword,String userCpf,String userRank,String userRole)throws Exception{
 		String sqlCreate = """
-				INSERT INTO tb_users(user_name,user_email,user_password,user_telefone,user_cpf,user_money,user_rank,user_role) VALUES(?,?,?,?,?,?,?,?)
+				INSERT INTO tb_users(user_name,user_email,user_password,user_cpf,user_money,user_rank,user_role) VALUES(?,?,?,?,?,?,?)
 				""";
 		try(Connection con = dataSource.getConnection()){
 			try(PreparedStatement stmtCreate = con.prepareStatement(sqlCreate)){
 				stmtCreate.setString(1, userName);
 				stmtCreate.setString(2, userEmail);
 				stmtCreate.setString(3, userHashPassword);
-				stmtCreate.setString(4, userTelefone);
-				stmtCreate.setString(5, userCpf);
-				stmtCreate.setInt(6, 0);
-				stmtCreate.setString(7, UserRankEnum.valueOf(userRank).name());
-				stmtCreate.setString(8, UserRoleEnum.valueOf(userRole).name());
+				stmtCreate.setString(4, userCpf);
+				stmtCreate.setInt(5, 0);
+				stmtCreate.setString(6, UserRankEnum.valueOf(userRank).name());
+				stmtCreate.setString(7, UserRoleEnum.valueOf(userRole).name());
 				stmtCreate.executeUpdate();
 				
 			}
