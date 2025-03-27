@@ -18,6 +18,7 @@ import com.calygam.back.dtos.RegisterDTO;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.services.TokenService;
 import com.calygam.back.services.UserServices;
+import com.calygam.back.services.UsersServices;
 
 import jakarta.validation.Valid;
 
@@ -27,6 +28,9 @@ public class AuthorizationController {
 	@Autowired
 	private UserServices service;
 	
+	@Autowired 
+	private UsersServices usersServices;
+	
 	@Autowired
 	private AuthenticationManager authenticationManager;
 	
@@ -35,36 +39,21 @@ public class AuthorizationController {
 	
 	
 	@PostMapping("/register")
-	public ResponseEntity<?> CreateOneNewUserInMyBase(@Valid @RequestBody RegisterDTO data, BindingResult result)throws Exception{
-	    if (result.hasErrors()) {
-	        
-	        return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(result.getFieldError().getDefaultMessage());
-	    }
-		try {
-		if(service.userExistentInMyBaseService(data.getUserEmail(),data.getUserCpf())) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Usuário já está cadastrado!");
-		}else {
-			String encrypitedPassword = new BCryptPasswordEncoder().encode(data.getUserPassword());
+	public RegisterDTO CreateOneNewUserInMyBase(@Valid @RequestBody RegisterDTO data, BindingResult result)throws Exception{
+	   
+	
+			
+		RegisterDTO registerDTO = usersServices.CreateANewUser(data);
 
-			return 	service.CreateOneNewUserInMyBaseService(
-					data.getUserName(),
-					data.getUserEmail(),
-					encrypitedPassword,
-
-					data.getUserCpf(),
-					
-					data.getUserRank().BRONZEI.name(),
-					data.getUserRole().ALUNO.name());
+			return registerDTO;
 		
 					
+		
 		}
-		}
-		catch(Exception e) {
-			return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
-		}
+		
 	
 				
-	}
+	
 	@PostMapping("/login")
 	public ResponseEntity<?> login(@Valid @RequestBody AuthenticationDTO data) {
 		var usernamePassword = new UsernamePasswordAuthenticationToken(data.getUserEmail(), data.getUserPassword());

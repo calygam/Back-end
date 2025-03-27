@@ -30,7 +30,7 @@ public class UserEntity implements UserDetails {
 	
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
-	private Integer userId;
+	private Long userId;
 	
 	@Column(name = "user_google_id")
 	private String userGoogleId;
@@ -89,7 +89,11 @@ public class UserEntity implements UserDetails {
 
 
 
-	public UserEntity(Integer userId, String userGoogleId, String userName,
+	
+
+
+
+	public UserEntity(Long userId, String userGoogleId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
 			String userPassword, String userImageParfil, String userTelefone,
 			@CPF(message = "calygam<- CPF inválido") String userCpf, BigInteger userMoney, Integer xp,
@@ -111,13 +115,30 @@ public class UserEntity implements UserDetails {
 
 
 
-	public Integer getUserId() {
+
+
+
+
+
+	public Long getUserId() {
 		return userId;
 	}
 
-	public void setUserId(Integer userId) {
+
+
+
+
+
+
+	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
+
+
+
+
+
+
 
 	public String getUserGoogleId() {
 		return userGoogleId;
