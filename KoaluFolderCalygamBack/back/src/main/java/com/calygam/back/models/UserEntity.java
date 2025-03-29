@@ -24,7 +24,7 @@ import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotNull;
 
-@Entity(name = "tb_users")
+@Entity
 @Table(name = "tb_users")
 public class UserEntity implements UserDetails {
 	
@@ -198,6 +198,7 @@ public class UserEntity implements UserDetails {
 
 	public void setXp(Integer xp) {
 		this.xp = xp;
+		 this.userRank = UserRankEnum.getRankForXp(xp);
 	}
 
 

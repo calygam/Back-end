@@ -1,5 +1,7 @@
 package com.calygam.back.enums;
 
+
+
 public enum UserRankEnum {
 		BRONZEI(0,"BRONZE-I"),
 		BRONZEII(500,"BRONZE-II"),
@@ -22,7 +24,7 @@ public enum UserRankEnum {
 		
 		DIAMOND(7500,"DIAMOND-I"),
 		DIAMONDII(8000,"DIAMOND-II"),
-		DIAMOUNDIII(8500,"DIAMOND-III"),
+		DIAMONDIII(8500,"DIAMOND-III"),
 		
 		ASCENDENT(10000,"ASCENDENT-I"),
 		ASCENDENTII(12000,"ASCENDENT-II"),
@@ -37,15 +39,50 @@ public enum UserRankEnum {
 	public Integer getPoints() {
 		return points;
 	}
-	public void setPoints(Integer points) {
-		this.points = points;
-	}
+
 	public String getNameRank() {
 		return nameRank;
 	}
-	public void setNameRank(String nameRank) {
-		this.nameRank = nameRank;
-	}
+	public static Integer getRankForXpPoints(int xp) {
+		Integer bestRank = BRONZEI.getPoints();
+        
+        for (UserRankEnum rank : UserRankEnum.values()) {
+            if ( rank.getPoints()> xp) {
+                bestRank = rank.getPoints();
+                break;
+            }
+       
+        }
+        
+        return bestRank;
+    }
+
+	public static UserRankEnum getRankForXp(int xp) {
+        UserRankEnum bestRank = BRONZEI;
+        
+        for (UserRankEnum rank : UserRankEnum.values()) {
+            if (xp <= rank.getPoints()) {
+                break;
+            }
+            bestRank = rank;
+        }
+        
+        return bestRank;
+    }
+	
+	public static String getRankForXpToString(int xp) {
+        String bestRank = BRONZEI.getNameRank();
+        
+        for (UserRankEnum rank : UserRankEnum.values()) {
+            if (xp < rank.getPoints()) {
+                break;
+            }
+            bestRank = rank.getNameRank();
+        }
+        
+        return bestRank;
+    }
+	
 	
 	
 	

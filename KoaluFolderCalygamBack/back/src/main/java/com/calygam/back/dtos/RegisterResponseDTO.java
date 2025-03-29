@@ -10,10 +10,8 @@ import com.calygam.back.models.UserEntity;
 
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
-import jakarta.validation.constraints.Pattern;
 
-public class RegisterDTO {
-	
+public class RegisterResponseDTO {
 	private Long id;
 	
     @NotBlank(message = "Nome não pode estar vazio!")
@@ -23,113 +21,83 @@ public class RegisterDTO {
     @Email(message = "Email inválido!")
     private String userEmail;
 
-    @NotBlank(message = "Senha não pode estar vazia!")
-    private String userPassword;
-
-
     @NotBlank(message = "CPF não pode estar vazio!")
     @CPF(message = "CPF inválido!")
     private String userCpf;
     
-	private BigInteger userMoney;
-	private UserRankEnum userRank;
-	private UserRoleEnum userRole;
-	
-	
 
-
-	public RegisterDTO() {
+	private String userRank;
+	
+	public RegisterResponseDTO() {
 		super();
 	}
 
-
-	public RegisterDTO(Long id, @NotBlank(message = "Nome não pode estar vazio!") String userName,
+	public RegisterResponseDTO(Long id, @NotBlank(message = "Nome não pode estar vazio!") String userName,
 			@NotBlank(message = "Email não pode estar vazio!") @Email(message = "Email inválido!") String userEmail,
-			@NotBlank(message = "Senha não pode estar vazia!") String userPassword,
 			@NotBlank(message = "CPF não pode estar vazio!") @CPF(message = "CPF inválido!") String userCpf,
-			BigInteger userMoney, UserRankEnum userRank, UserRoleEnum userRole) {
+			String userRank) {
 		super();
 		this.id = id;
 		this.userName = userName;
 		this.userEmail = userEmail;
-		this.userPassword = userPassword;
 		this.userCpf = userCpf;
-		this.userMoney = userMoney;
 		this.userRank = userRank;
-		this.userRole = userRole;
 	}
 	
-	
-	public RegisterDTO(UserEntity entity) {
-		super();
+	//caio<- trazendo apenas o necessario na resposta: 
+	public RegisterResponseDTO(UserEntity entity,Integer xp) {
 		id = entity.getUserId();
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();
-		userPassword = entity.getPassword();
 		userCpf = entity.getUserCpf();
-		userMoney = entity.getUserMoney();
-		userRank = entity.getUserRank();
-		userRole = entity.getUserRole();
+		userRank = UserRankEnum.getRankForXpToString(xp);
 	}
-	
 
-	
-	
 	public Long getId() {
 		return id;
 	}
-
-
 
 	public void setId(Long id) {
 		this.id = id;
 	}
 
-
-
 	public String getUserName() {
 		return userName;
 	}
+
 	public void setUserName(String userName) {
 		this.userName = userName;
 	}
+
 	public String getUserEmail() {
 		return userEmail;
 	}
+
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
-	}
-	public String getUserPassword() {
-		return userPassword;
-	}
-	public void setUserPassword(String userPassword) {
-		this.userPassword = userPassword;
 	}
 
 	public String getUserCpf() {
 		return userCpf;
 	}
+
 	public void setUserCpf(String userCpf) {
 		this.userCpf = userCpf;
 	}
-	public BigInteger getUserMoney() {
-		return userMoney;
-	}
-	public void setUserMoney(BigInteger userMoney) {
-		this.userMoney = userMoney;
-	}
-	public UserRankEnum getUserRank() {
+
+	public String getUserRank() {
 		return userRank;
 	}
-	public void setUserRank(UserRankEnum userRank) {
+
+	public void setUserRank(String userRank) {
 		this.userRank = userRank;
 	}
-	public UserRoleEnum getUserRole() {
-		return userRole;
-	}
-	public void setUserRole(UserRoleEnum userRole) {
-		this.userRole = userRole;
-	}
+
+
+	
+	
+	
+	
 	
 	
 

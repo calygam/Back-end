@@ -1,12 +1,9 @@
 package com.calygam.back.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
-import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -15,6 +12,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.calygam.back.dtos.AuthenticationDTO;
 import com.calygam.back.dtos.LoginResponseDTO;
 import com.calygam.back.dtos.RegisterDTO;
+import com.calygam.back.dtos.RegisterResponseDTO;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.services.TokenService;
 import com.calygam.back.services.UserServices;
@@ -39,11 +37,11 @@ public class AuthorizationController {
 	
 	
 	@PostMapping("/register")
-	public RegisterDTO CreateOneNewUserInMyBase(@Valid @RequestBody RegisterDTO data, BindingResult result)throws Exception{
+	public RegisterResponseDTO CreateOneNewUserInMyBase(@Valid @RequestBody RegisterDTO data)throws Exception{
 	   
 	
 			
-		RegisterDTO registerDTO = usersServices.CreateANewUser(data);
+		RegisterResponseDTO registerDTO = usersServices.CreateANewUser(data);
 
 			return registerDTO;
 		
