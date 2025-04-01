@@ -1,6 +1,7 @@
 package com.calygam.back.models;
 
 import java.math.BigInteger;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
@@ -13,16 +14,15 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
-import jakarta.persistence.EnumType;
-import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotNull;
 
 @Entity
 @Table(name = "tb_users")
@@ -33,7 +33,7 @@ public class UserEntity implements UserDetails {
 	private Long userId;
 	
 	@Column(name = "user_google_id")
-	private String userGoogleId;
+	private String userProviderId;
 	
 	@Column(name="user_name",nullable = false)
 	private String userName;
@@ -49,12 +49,11 @@ public class UserEntity implements UserDetails {
 	private String userPassword;
 	
 	@Column(name="user_image_perfil")
-	private String userImageParfil;
+	private String userImagePerfil;
 	
 	
 	
-	@Column(name="user_telefone")
-	private String userTelefone;
+
 	
 	@Column(name="user_cpf",nullable=false)
 	@CPF(message="calygam<- CPF inválido")
@@ -65,16 +64,17 @@ public class UserEntity implements UserDetails {
 	@Column(name="user_xp")
 	private Integer xp;
 	
-	@Enumerated(EnumType.STRING)
+	
 	@Column(name="user_rank")
 	private UserRankEnum userRank;
 	
-	@Enumerated(EnumType.STRING)
+	
 	@Column(name="user_role")
 	private UserRoleEnum userRole;
 	
 
-
+	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
+	private List<TrailEntity> trails = new ArrayList<TrailEntity>();
 
 
 
@@ -93,59 +93,46 @@ public class UserEntity implements UserDetails {
 
 
 
-	public UserEntity(Long userId, String userGoogleId, String userName,
+
+
+
+
+
+
+
+
+
+	public UserEntity(Long userId, String userProviderId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
-			String userPassword, String userImageParfil, String userTelefone,
-			@CPF(message = "calygam<- CPF inválido") String userCpf, BigInteger userMoney, Integer xp,
-			UserRankEnum userRank, UserRoleEnum userRole) {
+			String userPassword, String userImagePerfil, @CPF(message = "calygam<- CPF inválido") String userCpf,
+			BigInteger userMoney, Integer xp, UserRankEnum userRank, UserRoleEnum userRole, List<TrailEntity> trails) {
 		super();
 		this.userId = userId;
-		this.userGoogleId = userGoogleId;
+		this.userProviderId = userProviderId;
 		this.userName = userName;
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
-		this.userImageParfil = userImageParfil;
-		this.userTelefone = userTelefone;
+		this.userImagePerfil = userImagePerfil;
 		this.userCpf = userCpf;
 		this.userMoney = userMoney;
 		this.xp = xp;
 		this.userRank = userRank;
 		this.userRole = userRole;
+		this.trails = trails;
 	}
-
-
-
-
-
-
-
 
 	public Long getUserId() {
 		return userId;
 	}
-
-
-
-
-
-
-
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-
-
-
-
-
-
-
-	public String getUserGoogleId() {
-		return userGoogleId;
+	public String getuserProviderId() {
+		return userProviderId;
 	}
 
-	public void setUserGoogleId(String userGoogleId) {
-		this.userGoogleId = userGoogleId;
+	public void setuserProviderId(String userProviderId) {
+		this.userProviderId = userProviderId;
 	}
 
 	public String getUserName() {
@@ -171,19 +158,6 @@ public class UserEntity implements UserDetails {
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
-
-
-
-	public String getUserTelefone() {
-		return userTelefone;
-	}
-
-	public void setUserTelefone(String userTelefone) {
-		this.userTelefone = userTelefone;
-	}
-
-
-
 	public String getUserCpf() {
 		return userCpf;
 	}
@@ -200,11 +174,6 @@ public class UserEntity implements UserDetails {
 		this.xp = xp;
 		 this.userRank = UserRankEnum.getRankForXp(xp);
 	}
-
-
-
-
-
 	public BigInteger getUserMoney() {
 		return userMoney;
 	}
@@ -229,14 +198,25 @@ public class UserEntity implements UserDetails {
 		this.userRole = userRole;
 	}
 
-	public String getUserImageParfil() {
-		return userImageParfil;
+	public String getuserImagePerfil() {
+		return userImagePerfil;
 	}
 
-	public void setUserImageParfil(String userImageParfil) {
-		this.userImageParfil = userImageParfil;
+	public void setuserImagePerfil(String userImagePerfil) {
+		this.userImagePerfil = userImagePerfil;
 	}
-
+	public String getUserProviderId() {
+		return userProviderId;
+	}
+	public void setUserProviderId(String userProviderId) {
+		this.userProviderId = userProviderId;
+	}
+	public List<TrailEntity> getTrails() {
+		return trails;
+	}
+	public void setTrails(List<TrailEntity> trails) {
+		this.trails = trails;
+	}
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		if(this.userRole == UserRoleEnum.ADMIN) {
@@ -245,12 +225,17 @@ public class UserEntity implements UserDetails {
 					new SimpleGrantedAuthority("ROLE_INSTRUTOR"),
 					new SimpleGrantedAuthority("ROLE_ALUNO"));
 		}else if(this.userRole == UserRoleEnum.COORDENADOR) {
-			return List.of(new SimpleGrantedAuthority("ROLE_COORDENADOR"));
+			return List.of(
+					new SimpleGrantedAuthority("ROLE_COORDENADOR"),
+					new SimpleGrantedAuthority("ROLE_INSTRUTOR"),
+					new SimpleGrantedAuthority("ROLE_ALUNO"));
 		}else if(this.userRole == UserRoleEnum.ALUNO) {
 			return List.of(new SimpleGrantedAuthority("ROLE_ALUNO"));
 		}
 		else if(this.userRole == UserRoleEnum.INSTRUTOR) {
-			return List.of(new SimpleGrantedAuthority("ROLE_INSTRUTOR"));
+			return List.of(
+					new SimpleGrantedAuthority("ROLE_INSTRUTOR"),
+					new SimpleGrantedAuthority("ROLE_ALUNO"));
 		}
 		return null;
 	}

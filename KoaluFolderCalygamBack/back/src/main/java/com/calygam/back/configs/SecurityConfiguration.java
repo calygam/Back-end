@@ -30,6 +30,7 @@ public class SecurityConfiguration {
 				.sessionManagement(sessionManagement -> sessionManagement.sessionCreationPolicy(SessionCreationPolicy.STATELESS))
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers(HttpMethod.POST,"/auth/register","/auth/login").permitAll()
+						.requestMatchers(HttpMethod.GET,"/trail/hello-world").hasRole("INSTRUTOR")
 				
 						.anyRequest().authenticated())
 				.addFilterBefore(mySecurityFilter, UsernamePasswordAuthenticationFilter.class)

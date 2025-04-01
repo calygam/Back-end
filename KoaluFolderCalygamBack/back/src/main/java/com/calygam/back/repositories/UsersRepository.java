@@ -15,8 +15,14 @@ public interface UsersRepository extends JpaRepository<UserEntity,Long> {
 	
     @Query("SELECT new com.calygam.back.dtos.DataUtilUserDTO(" +
             "u.userId, u.userName, u.userEmail, u.userCpf, u.xp, " +
-            " u.userImageParfil, u.userMoney) " +
+            " u.userImagePerfil, u.userMoney) " +
             "FROM UserEntity u WHERE u.userId = :userId")
      Optional<DataUtilUserDTO> findByUserId(@Param("userId") Long userId);
+    
+    @Query("""
+    		SELECT u FROM UserEntity u LEFT JOIN FETCH u.trails WHERE u.userId = :userId
+    		""")
+     Optional<UserEntity> findUserPasswordById(@Param("userId") Long userId);
 	
 }
+//

@@ -1,56 +1,33 @@
-package com.calygam.back.models;
+package com.calygam.back.dtos;
 
 import java.time.LocalDate;
 
-import jakarta.persistence.Column;
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.JoinColumn;
-import jakarta.persistence.ManyToOne;
-import jakarta.persistence.Table;
+import com.calygam.back.models.TrailEntity;
 
-@Entity
-@Table(name="tb_trail")
-public class TrailEntity {
+import jakarta.persistence.Column;
+
+public class TrailDTO {
 	
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	@Column(name="trail_id")
 	private Long trailId;
-	
-	@Column(name="trail_name")
+
 	private String trailName;
-	
-	@Column(name="trail_description")
+
 	private String trailDescription;
-	
-	@Column(name="trail_price")
+
 	private Long trailPrice;
-	
-	@Column(name="trail_created_date")
+
 	private LocalDate trailCreatedDate;
-	
-	@Column(name="trail_updated_date")
+
 	private LocalDate trailUpdatedDate;
 	
-	@Column(name="trail_password")
 	private String trailPassword;
-	
-	
-	@ManyToOne
-	@JoinColumn(name="user_id")
-	private UserEntity user;
-	
-	
-	public TrailEntity() {
+
+	public TrailDTO() {
 		super();
 	}
 
-
-	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice,
-			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, UserEntity user) {
+	public TrailDTO(Long trailId, String trailName, String trailDescription, Long trailPrice,
+			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
@@ -59,7 +36,18 @@ public class TrailEntity {
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 		this.trailPassword = trailPassword;
-		this.user = user;
+	}
+	
+	public TrailDTO(TrailEntity entity) {
+		super();
+		trailId = entity.getTrailId();
+		trailName = entity.getTrailName();
+		trailDescription = entity.getTrailDescription();
+		trailPrice = entity.getTrailPrice();
+		trailCreatedDate = entity.getTrailCreatedDate();
+		trailUpdatedDate = entity.getTrailUpdatedDate();
+		trailPassword = entity.getTrailPassword();
+		
 	}
 
 	public Long getTrailId() {
@@ -117,20 +105,6 @@ public class TrailEntity {
 	public void setTrailPassword(String trailPassword) {
 		this.trailPassword = trailPassword;
 	}
-
-	public UserEntity getUser() {
-		return user;
-	}
-
-	public void setUser(UserEntity user) {
-		this.user = user;
-	}
-	
-	
-	
-	
-
-
 	
 	
 	

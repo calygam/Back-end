@@ -1,8 +1,11 @@
 package com.calygam.back.dtos;
 
 import java.math.BigInteger;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import com.calygam.back.enums.UserRankEnum;
+import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
 
 public class DataUtilUserDTO {
@@ -16,6 +19,7 @@ public class DataUtilUserDTO {
 	private Integer userRankPoints;
 	private String userImage;
 	private BigInteger userMoney;
+	private List<TrailDTO> trails;
 	public DataUtilUserDTO() {
 		super();
 	}
@@ -31,7 +35,11 @@ public class DataUtilUserDTO {
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
 		this.userImage = userImage;
 		this.userMoney = userMoney;
+
+		
 	}
+	
+	
 	
 	
 	public DataUtilUserDTO(UserEntity entity) {
@@ -41,9 +49,15 @@ public class DataUtilUserDTO {
 		userEmail = entity.getUserEmail();
 		userCpf = entity.getUserCpf();
 		userXp = entity.getXp();
-		userRank = UserRankEnum.getRankForXpToString(entity.getXp());
-		userImage = entity.getUserImageParfil();
+		this.userRank = UserRankEnum.getRankForXpToString(userXp);
+		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
+		userImage = entity.getuserImagePerfil();
 		userMoney = entity.getUserMoney();
+        this.trails = entity.getTrails() != null
+                ? entity.getTrails().stream()
+                        .map(TrailDTO::new)
+                        .collect(Collectors.toList())
+                : List.of(); 
 	}
 	
 	public Long getId() {
@@ -100,6 +114,14 @@ public class DataUtilUserDTO {
 	public void setUserRankPoints(Integer userRankPoints) {
 		this.userRankPoints = userRankPoints;
 	}
+	public List<TrailDTO> getTrails() {
+		return trails;
+	}
+	public void setTrails(List<TrailDTO> trails) {
+		this.trails = trails;
+	}
+	
+	
 	
 	
 	
