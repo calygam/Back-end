@@ -25,6 +25,6 @@ public class UsersController {
 		
 		token = token.replace("Bearer ", "");
 		Optional<DataUtilUserDTO> user = usersServices.ReadInfoUserByIdService(token);
-		return ResponseEntity.ok(user.get());
+		return ResponseEntity.ok(user);
 	}
 }

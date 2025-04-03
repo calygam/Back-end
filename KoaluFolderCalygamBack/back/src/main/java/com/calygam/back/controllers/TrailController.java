@@ -1,16 +1,39 @@
 package com.calygam.back.controllers;
 
-import org.springframework.http.ResponseEntity;
+import java.util.List;
+
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.ModelAttribute;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+
+import com.calygam.back.dtos.TrailDTO;
+import com.calygam.back.services.JwtUtilsId;
+import com.calygam.back.services.TrailService;
 
 @RestController
 @RequestMapping("trail")
 public class TrailController {
 	
-	@GetMapping("hello-world")
-	public ResponseEntity<?> getMyMessage(){
-		return ResponseEntity.ok("oiee eu sou um professor!");
+	@Autowired
+	TrailService trailService;
+	
+	@Autowired
+	JwtUtilsId jwtUtilsId;
+	
+	
+	
+	@PostMapping("/create")
+	public TrailDTO createNewTrail(@RequestHeader("Authorization") String token,@ModelAttribute TrailDTO trailDTO){
+		token = token.replace("Bearer ","");
+		Long userId = jwtUtilsId.getUserIdFromToken(token);
+		return trailService.createNewTrail(userId, trailDTO);
+	}
+	@GetMapping("/read/all-trails")
+	public List<TrailDTO> ReadAllTrails() {
+		return trailService.ReadAllTrails();
 	}
 }

@@ -23,11 +23,14 @@ public class TrailEntity {
 	@Column(name="trail_name")
 	private String trailName;
 	
-	@Column(name="trail_description")
+	@Column(name="trail_description", columnDefinition = "TEXT")
 	private String trailDescription;
 	
 	@Column(name="trail_price")
 	private Long trailPrice;
+	
+	@Column(name="trail_image")
+	private String trailImage;
 	
 	@Column(name="trail_created_date")
 	private LocalDate trailCreatedDate;
@@ -38,6 +41,11 @@ public class TrailEntity {
 	@Column(name="trail_password")
 	private String trailPassword;
 	
+	@Column(name="trail_vacancy")
+	private Long trailVacancy;
+	
+	@Column(name="trail_vacancies")
+	private Long trailVacancies;
 	
 	@ManyToOne
 	@JoinColumn(name="user_id")
@@ -49,18 +57,37 @@ public class TrailEntity {
 	}
 
 
-	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice,
-			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, UserEntity user) {
+
+
+
+
+
+
+
+	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice, String trailImage,
+			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, Long trailVacancy,
+			Long trailVacancies, UserEntity user) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
 		this.trailDescription = trailDescription;
 		this.trailPrice = trailPrice;
+		this.trailImage = trailImage;
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 		this.trailPassword = trailPassword;
+		this.trailVacancy = trailVacancy;
+		this.trailVacancies = trailVacancies;
 		this.user = user;
 	}
+
+
+
+
+
+
+
+
 
 	public Long getTrailId() {
 		return trailId;
@@ -125,6 +152,60 @@ public class TrailEntity {
 	public void setUser(UserEntity user) {
 		this.user = user;
 	}
+
+
+
+
+	public Long getTrailVacancy() {
+		return trailVacancy;
+	}
+
+
+
+
+	public void setTrailVacancy(Long trailVacancy) {
+		this.trailVacancy = trailVacancy;
+	}
+
+
+
+
+	public Long getTrailVacancies() {
+		return trailVacancies;
+	}
+
+
+
+
+	public void setTrailVacancies(Long trailVacancies) {
+		this.trailVacancies = trailVacancies;
+	}
+
+
+
+
+
+
+
+
+
+	public String getTrailImage() {
+		return trailImage;
+	}
+
+
+
+
+
+
+
+
+
+	public void setTrailImage(String trailImage) {
+		this.trailImage = trailImage;
+	}
+	
+	
 	
 	
 	
