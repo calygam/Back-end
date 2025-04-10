@@ -5,6 +5,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import com.calygam.back.enums.UserRankEnum;
+import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
 
@@ -18,13 +19,14 @@ public class DataUtilUserDTO {
 	private String userRank;	
 	private Integer userRankPoints;
 	private String userImage;
+	private UserRoleEnum userRole;
 	private BigInteger userMoney;
 	private List<TrailDTO> trails;
 	public DataUtilUserDTO() {
 		super();
 	}
 	public DataUtilUserDTO(Long id, String userName, String userEmail, String userCpf, Integer userXp,
-			String userImage, BigInteger userMoney) {
+			String userImage, UserRoleEnum userRole, BigInteger userMoney) {
 		super();
 		this.id = id;
 		this.userName = userName;
@@ -34,6 +36,7 @@ public class DataUtilUserDTO {
 		this.userRank = UserRankEnum.getRankForXpToString(userXp);
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
 		this.userImage = userImage;
+		this.userRole = userRole;
 		this.userMoney = userMoney;
 
 		
@@ -120,6 +123,14 @@ public class DataUtilUserDTO {
 	public void setTrails(List<TrailDTO> trails) {
 		this.trails = trails;
 	}
+	public UserRoleEnum getUserRole() {
+		return userRole;
+	}
+	public void setUserRole(UserRoleEnum userRole) {
+		this.userRole = userRole;
+	}
+	
+	
 	
 	
 	
