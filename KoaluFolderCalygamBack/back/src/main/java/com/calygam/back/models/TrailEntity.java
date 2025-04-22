@@ -1,6 +1,10 @@
 package com.calygam.back.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+
+import com.calygam.back.enums.StatusOfLife;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -9,6 +13,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -41,6 +46,9 @@ public class TrailEntity {
 	@Column(name="trail_password")
 	private String trailPassword;
 	
+	@Column(name="trail_status")
+	private StatusOfLife trailStatus;
+	
 	@Column(name="trail_vacancy")
 	private Long trailVacancy;
 	
@@ -51,6 +59,9 @@ public class TrailEntity {
 	@JoinColumn(name="user_id")
 	private UserEntity user;
 	
+	@OneToMany(mappedBy="trail")
+	private List<ActivityEntity> activities = new ArrayList<>();
+	
 	
 	public TrailEntity() {
 		super();
@@ -59,14 +70,9 @@ public class TrailEntity {
 
 
 
-
-
-
-
-
 	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice, String trailImage,
-			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, Long trailVacancy,
-			Long trailVacancies, UserEntity user) {
+			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, StatusOfLife trailStatus,
+			Long trailVacancy, Long trailVacancies, UserEntity user, List<ActivityEntity> activities) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
@@ -76,15 +82,12 @@ public class TrailEntity {
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 		this.trailPassword = trailPassword;
+		this.trailStatus = trailStatus;
 		this.trailVacancy = trailVacancy;
 		this.trailVacancies = trailVacancies;
 		this.user = user;
+		this.activities = activities;
 	}
-
-
-
-
-
 
 
 
@@ -154,20 +157,14 @@ public class TrailEntity {
 	}
 
 
-
-
 	public Long getTrailVacancy() {
 		return trailVacancy;
 	}
 
 
-
-
 	public void setTrailVacancy(Long trailVacancy) {
 		this.trailVacancy = trailVacancy;
 	}
-
-
 
 
 	public Long getTrailVacancies() {
@@ -176,17 +173,9 @@ public class TrailEntity {
 
 
 
-
 	public void setTrailVacancies(Long trailVacancies) {
 		this.trailVacancies = trailVacancies;
 	}
-
-
-
-
-
-
-
 
 
 	public String getTrailImage() {
@@ -194,28 +183,31 @@ public class TrailEntity {
 	}
 
 
-
-
-
-
-
-
-
 	public void setTrailImage(String trailImage) {
 		this.trailImage = trailImage;
 	}
-	
-	
-	
-	
-	
-	
+
+	public List<ActivityEntity> getActivities() {
+		return activities;
+	}
+
+	public void setActivities(List<ActivityEntity> activities) {
+		this.activities = activities;
+	}
 
 
-	
-	
-	
-	
+
+
+	public StatusOfLife getTrailStatus() {
+		return trailStatus;
+	}
+
+
+
+
+	public void setTrailStatus(StatusOfLife trailStatus) {
+		this.trailStatus = trailStatus;
+	}
 	
 	
 }
