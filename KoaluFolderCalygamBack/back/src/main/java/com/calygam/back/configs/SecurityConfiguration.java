@@ -31,7 +31,7 @@ public class SecurityConfiguration {
 				.authorizeHttpRequests(authorize -> authorize
 						.requestMatchers(HttpMethod.POST,"/auth/register","/auth/login").permitAll()
 						.requestMatchers(HttpMethod.GET,"/trail/hello-world").hasRole("INSTRUTOR")
-				
+						.requestMatchers("/file/read/**").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(mySecurityFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();

@@ -14,21 +14,18 @@ public interface TrailRepository extends JpaRepository<TrailEntity, Long> {
 	
 	@Query("""
 			 SELECT NEW com.calygam.back.dtos.TrailDTO(
-				  t.trailId, t.trailName, t.trailImage,
+				  t.trailId, t.trailName, t.archiveName,
 				 	t.trailDescription,t.trailPrice,
 			t.trailCreatedDate,t.trailUpdatedDate,t.trailVacancy,
 			t.trailVacancies,t.user.userId)
-			 FROM TrailEntity t WHERE  t.trailName = :trailName 
+			 FROM TrailEntity t WHERE  t.trailName = :trailName AND t.user.userId = :userId 
 			""")
 	
 	TrailDTO findExistentTrail(@Param("userId")Long userId,@Param("trailName")String trailName);
-	
-	@Query("""
-            SELECT NEW com.calygam.back.dtos.TrailDTO(
-                t.trailId, t.trailName, t.trailImage, t.trailDescription, t.trailPrice,
-                t.trailCreatedDate, t.trailUpdatedDate, t.trailVacancy, t.trailVacancies, t.user.userId
-            )
-            FROM TrailEntity t
-            """)
-    List<TrailDTO> findAllTrails();
+    @Query("""
+    	      SELECT DISTINCT t
+    	      FROM TrailEntity t
+    	      LEFT JOIN FETCH t.activities
+    	    """)
+		List<TrailDTO> findAllTrailsWithActivities();
 }

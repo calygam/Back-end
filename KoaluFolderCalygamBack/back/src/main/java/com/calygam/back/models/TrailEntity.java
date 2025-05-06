@@ -5,7 +5,9 @@ import java.util.ArrayList;
 import java.util.List;
 
 import com.calygam.back.enums.StatusOfLife;
+import com.calygam.back.utils.GenericFileManagement;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -18,7 +20,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tb_trail")
-public class TrailEntity {
+public class TrailEntity implements GenericFileManagement {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -34,8 +36,7 @@ public class TrailEntity {
 	@Column(name="trail_price")
 	private Long trailPrice;
 	
-	@Column(name="trail_image")
-	private String trailImage;
+
 	
 	@Column(name="trail_created_date")
 	private LocalDate trailCreatedDate;
@@ -58,8 +59,19 @@ public class TrailEntity {
 	@ManyToOne
 	@JoinColumn(name="user_id")
 	private UserEntity user;
+	@Column(name="trail_archive_name")
+	private String archiveName;
 	
-	@OneToMany(mappedBy="trail")
+	@Column(name="trail_original_name")
+	private String originalName;
+	
+	@Column(name="trail_archive_path")
+	private String archivePath;
+	
+	@Column(name="trail_archive_type")
+	private String archiveType;
+	
+	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ActivityEntity> activities = new ArrayList<>();
 	
 	
@@ -70,15 +82,19 @@ public class TrailEntity {
 
 
 
-	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice, String trailImage,
+
+
+
+
+	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice,
 			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, StatusOfLife trailStatus,
-			Long trailVacancy, Long trailVacancies, UserEntity user, List<ActivityEntity> activities) {
+			Long trailVacancy, Long trailVacancies, UserEntity user, String archiveName, String originalName,
+			String archivePath, String archiveType, List<ActivityEntity> activities) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
 		this.trailDescription = trailDescription;
 		this.trailPrice = trailPrice;
-		this.trailImage = trailImage;
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 		this.trailPassword = trailPassword;
@@ -86,8 +102,16 @@ public class TrailEntity {
 		this.trailVacancy = trailVacancy;
 		this.trailVacancies = trailVacancies;
 		this.user = user;
+		this.archiveName = archiveName;
+		this.originalName = originalName;
+		this.archivePath = archivePath;
+		this.archiveType = archiveType;
 		this.activities = activities;
 	}
+
+
+
+
 
 
 
@@ -178,14 +202,6 @@ public class TrailEntity {
 	}
 
 
-	public String getTrailImage() {
-		return trailImage;
-	}
-
-
-	public void setTrailImage(String trailImage) {
-		this.trailImage = trailImage;
-	}
 
 	public List<ActivityEntity> getActivities() {
 		return activities;
@@ -195,19 +211,66 @@ public class TrailEntity {
 		this.activities = activities;
 	}
 
-
-
-
 	public StatusOfLife getTrailStatus() {
 		return trailStatus;
 	}
 
-
-
-
 	public void setTrailStatus(StatusOfLife trailStatus) {
 		this.trailStatus = trailStatus;
 	}
+
+	@Override
+	public void setArchiveName(String archiveName) {
+		this.archiveName = archiveName;
+		
+	}
+
+	@Override
+	public void setOriginalName(String originalName) {
+		this.originalName = originalName;
+		
+	}
+
+	@Override
+	public void setArchivePath(String archivePath) {
+		this.archivePath = archivePath;
+		
+	}
+
+	@Override
+	public void setArchiveType(String archiveType) {
+		this.archiveType = archiveType;
+		
+	}
+
+	@Override
+	public String getArchiveName() {
+		// TODO Auto-generated method stub
+		return archiveName;
+	}
+
+	@Override
+	public String getOriginalName() {
+		// TODO Auto-generated method stub
+		return originalName;
+	}
+
+	@Override
+	public String getArchivePath() {
+		// TODO Auto-generated method stub
+		return archivePath;
+	}
+
+	@Override
+	public String getArchiveType() {
+		// TODO Auto-generated method stub
+		return archiveType;
+	}
+
+
+
+
+
 	
 	
 }

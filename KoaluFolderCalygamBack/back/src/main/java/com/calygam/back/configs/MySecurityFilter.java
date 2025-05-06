@@ -32,7 +32,7 @@ public class MySecurityFilter extends OncePerRequestFilter {
 		
 		String path = request.getRequestURI();
 		
-		if(path.equals("/auth/register")|| path.equals("/auth/login")) {
+		if(path.equals("/auth/register")|| path.equals("/auth/login") ||path.startsWith("/file/read/")) {
 			filterChain.doFilter(request, response);
 			return;
 		}

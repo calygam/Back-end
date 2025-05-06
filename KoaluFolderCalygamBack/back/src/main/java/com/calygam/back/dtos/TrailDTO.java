@@ -1,12 +1,14 @@
 package com.calygam.back.dtos;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.calygam.back.models.TrailEntity;
-
-import jakarta.persistence.Column;
 
 public class TrailDTO {
 	private Long trailId;
@@ -21,6 +23,7 @@ public class TrailDTO {
 	private Long trailVacancy;
 	private Long trailVacancies;
 	private Long user;
+	private List<ActivityDTO> activities = new ArrayList<>();
 
 	public TrailDTO() {
 		super();
@@ -52,6 +55,28 @@ public class TrailDTO {
 		this.trailVacancies = trailVacancies;
 		this.user = user;
 	}
+	
+	
+
+
+	public TrailDTO(Long trailId, String trailName, String trailDescription, Long trailPrice,
+			MultipartFile trailFileImage, String trailImage, LocalDate trailCreatedDate, LocalDate trailUpdatedDate,
+			String trailPassword, Long trailVacancy, Long trailVacancies, Long user, List<ActivityDTO> activities) {
+		super();
+		this.trailId = trailId;
+		this.trailName = trailName;
+		this.trailDescription = trailDescription;
+		this.trailPrice = trailPrice;
+		this.trailFileImage = trailFileImage;
+		this.trailImage = trailImage;
+		this.trailCreatedDate = trailCreatedDate;
+		this.trailUpdatedDate = trailUpdatedDate;
+		this.trailPassword = trailPassword;
+		this.trailVacancy = trailVacancy;
+		this.trailVacancies = trailVacancies;
+		this.user = user;
+		this.activities = activities;
+	}
 
 
 	public TrailDTO(Long trailId, String trailName,String trailImage, String trailDescription, Long trailPrice,
@@ -79,16 +104,25 @@ public class TrailDTO {
 		super();
 		trailId = entity.getTrailId();
 		trailName = entity.getTrailName();
-		trailImage = entity.getTrailImage();
+		trailImage = entity.getArchiveName();
 		trailDescription = entity.getTrailDescription();
 		trailPrice = entity.getTrailPrice();
 		trailCreatedDate = entity.getTrailCreatedDate();
 		trailUpdatedDate = entity.getTrailUpdatedDate();
-		trailPassword = entity.getTrailPassword();
+		
 		trailVacancy = entity.getTrailVacancy();
 		trailVacancies = entity.getTrailVacancies();
 		user = entity.getUser().getUserId();
+		 this.trailImage = ServletUriComponentsBuilder
+	                .fromCurrentContextPath()
+	                .path("/file/read/")         
+	                .path(entity.getArchiveName())
+	                .toUriString();
+		this.activities = entity.getActivities().stream()
+		        .map(ActivityDTO::new) 
+		        .collect(Collectors.toList());
 	}
+	
 
 	public Long getTrailId() {
 		return trailId;
@@ -201,6 +235,18 @@ public class TrailDTO {
 	public void setTrailImage(String trailImage) {
 		this.trailImage = trailImage;
 	}
+
+
+	public List<ActivityDTO> getActivities() {
+		return activities;
+	}
+
+
+	public void setActivities(List<ActivityDTO> activities) {
+		this.activities = activities;
+	}
+	
+	
 	
 	
 	

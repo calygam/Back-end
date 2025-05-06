@@ -1,5 +1,6 @@
 package com.calygam.back.controllers;
 
+import java.io.IOException;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,7 +28,7 @@ public class TrailController {
 	
 	
 	@PostMapping("/create")
-	public TrailDTO createNewTrail(@RequestHeader("Authorization") String token,@ModelAttribute TrailDTO trailDTO){
+	public TrailDTO createNewTrail(@RequestHeader("Authorization") String token,@ModelAttribute TrailDTO trailDTO) throws IOException{
 		token = token.replace("Bearer ","");
 		Long userId = jwtUtilsId.getUserIdFromToken(token);
 		return trailService.createNewTrail(userId, trailDTO);

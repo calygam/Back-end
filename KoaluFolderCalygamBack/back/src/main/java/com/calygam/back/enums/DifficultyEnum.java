@@ -2,8 +2,8 @@ package com.calygam.back.enums;
 
 public enum DifficultyEnum {
 	
-	EASY("FÀCIL"),
-	MEDIUM("MÈDIO"),
+	EASY("FÁCIL"),
+	MEDIUM("MÉDIO"),
 	HARD("DIFÍCIL"),
 	BOSS("CHEFE");
 	
