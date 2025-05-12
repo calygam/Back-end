@@ -6,8 +6,9 @@ public enum StatusOfLife {
 	DESABLED("DESATIVO"),
 	COMPLETE("COMPLETA"),
 	WRONG("ERRADA"),
-	CORRECT("CORRETA");
-	;
+	CORRECT("CORRETA"),
+	BUILDING("CONSTRUINDO");
+	
 	
 	private String statusName;
 	StatusOfLife(String statusName) {

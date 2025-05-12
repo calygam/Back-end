@@ -119,4 +119,10 @@ public class MakeUploadAndDownloadArchive {
 	        return ResponseEntity.status(404).body(null);
 	    }
 	}
+	public void deleteFile(String archiveName) throws IOException {
+	    if (archiveName == null || archiveName.isBlank()) return;
+
+	    Path archivePath = sysUploadDir.resolve(archiveName);
+	    Files.deleteIfExists(archivePath);
+	}
 }

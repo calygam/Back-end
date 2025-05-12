@@ -8,12 +8,14 @@ import java.util.stream.Collectors;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.models.TrailEntity;
 
 public class TrailDTO {
 	private Long trailId;
 	private String trailName;
 	private String trailDescription;
+	private StatusOfLife trailStatus;
 	private Long trailPrice;
 	private MultipartFile trailFileImage;
 	private String trailImage;
@@ -23,7 +25,10 @@ public class TrailDTO {
 	private Long trailVacancy;
 	private Long trailVacancies;
 	private Long user;
+	
 	private List<ActivityDTO> activities = new ArrayList<>();
+	private String calygamCode;
+
 
 	public TrailDTO() {
 		super();
@@ -55,6 +60,8 @@ public class TrailDTO {
 		this.trailVacancies = trailVacancies;
 		this.user = user;
 	}
+	
+	
 	
 	
 
@@ -106,6 +113,7 @@ public class TrailDTO {
 		trailName = entity.getTrailName();
 		trailImage = entity.getArchiveName();
 		trailDescription = entity.getTrailDescription();
+		trailStatus = entity.getTrailStatus();
 		trailPrice = entity.getTrailPrice();
 		trailCreatedDate = entity.getTrailCreatedDate();
 		trailUpdatedDate = entity.getTrailUpdatedDate();
@@ -245,6 +253,30 @@ public class TrailDTO {
 	public void setActivities(List<ActivityDTO> activities) {
 		this.activities = activities;
 	}
+
+
+	public String getCalygamCode() {
+		return calygamCode;
+	}
+
+
+	public void setCalygamCode(String calygamCode) {
+		this.calygamCode = calygamCode;
+	}
+
+
+	public StatusOfLife getTrailStatus() {
+		return trailStatus;
+	}
+
+
+	public void setTrailStatus(StatusOfLife trailStatus) {
+		this.trailStatus = trailStatus;
+	}
+	
+	
+	
+	
 	
 	
 	

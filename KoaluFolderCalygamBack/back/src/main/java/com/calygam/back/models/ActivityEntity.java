@@ -26,7 +26,7 @@ public class ActivityEntity {
 	@Column(name="activity_name")
 	private String activityName;
 	
-	@Column(name="activity_description")
+	@Column(name="activity_description",columnDefinition="TEXT")
 	private String activityDescription;
 	
 	@Column(name="activity_price")

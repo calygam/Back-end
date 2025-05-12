@@ -12,4 +12,10 @@ public class SoftGlobalExceptions {
 	public ResponseEntity<String> GlobalUserAlreadExistsException(UserAlreadExistsException ex){
 		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
 	}
+	@ExceptionHandler(UnauthorizedAcessUserException.class)
+	public ResponseEntity<String> GlobalUnauthorizedAcessUserException(UnauthorizedAcessUserException ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.UNAUTHORIZED);
+	}
+	
+	
 }
