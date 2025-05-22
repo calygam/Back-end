@@ -1,0 +1,18 @@
+package com.calygam.back.projections;
+
+import java.time.LocalDate;
+
+import com.calygam.back.enums.DifficultyEnum;
+import com.calygam.back.enums.StatusOfLife;
+
+public interface ActivityProjection {
+	Integer getActivityId();
+	String getActivityName();
+	String getActivityDescription();
+	Integer getActivityPrice();
+	DifficultyEnum getActivityDifficulty();
+	StatusOfLife getActivityStatus();
+	LocalDate getActivityCreatedAt();
+	LocalDate getActivityUpdatedAt();
+	
+}

@@ -5,8 +5,7 @@ import java.time.LocalDate;
 import com.calygam.back.enums.DifficultyEnum;
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.models.ActivityEntity;
-
-import jakarta.persistence.Column;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ActivityDTO {
 
@@ -30,6 +29,9 @@ public class ActivityDTO {
 	
 
 	private LocalDate activityUpdatedAt;
+	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Long activityCont;
 
 	public ActivityDTO() {
 		super();
@@ -126,6 +128,15 @@ public class ActivityDTO {
 	public void setActivityUpdatedAt(LocalDate activityUpdatedAt) {
 		this.activityUpdatedAt = activityUpdatedAt;
 	}
+
+	public Long getActivityCont() {
+		return activityCont;
+	}
+
+	public void setActivityCont(Long activityCont) {
+		this.activityCont = activityCont;
+	}
+	
 	
 	
 }
