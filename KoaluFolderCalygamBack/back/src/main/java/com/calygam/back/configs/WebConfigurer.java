@@ -5,18 +5,19 @@ import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 
-@Configuration
+@Configuration 
 @EnableWebMvc
 public class WebConfigurer implements WebMvcConfigurer {
-	
-	@Override
-	public void addCorsMappings(CorsRegistry registry) {
-		registry.addMapping("/**")
-		.allowedOriginPatterns("*")
-		.allowedMethods("GET","POST","PUT","DELETE","OPTIONS")
-		.allowedHeaders("*")
-		.allowCredentials(true);
-		
-	}
-	
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+            .allowedOrigins(
+                "https://happy-wave-0b04a110f.6.azurestaticapps.net",
+                "http://localhost:5173"
+            )
+            .allowedMethods("GET", "POST", "PUT", "DELETE", "OPTIONS")
+            .allowedHeaders("*")
+            .allowCredentials(true);
+    }
 }
