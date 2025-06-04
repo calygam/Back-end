@@ -23,6 +23,11 @@ public interface UsersRepository extends JpaRepository<UserEntity,Long> {
     		SELECT u FROM UserEntity u LEFT JOIN FETCH u.trails WHERE u.userId = :userId
     		""")
      Optional<UserEntity> findUserPasswordById(@Param("userId") Long userId);
+    
+    @Query("SELECT u FROM UserEntity u WHERE u.userId = :userId ")
+    Optional<UserEntity>  findEntityByUserId(@Param("userId") Long userId);
+    
+  
 	
 }
 //

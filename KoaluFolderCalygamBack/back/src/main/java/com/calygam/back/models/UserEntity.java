@@ -75,6 +75,9 @@ public class UserEntity implements UserDetails {
 
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
 	private List<TrailEntity> trails = new ArrayList<TrailEntity>();
+	
+	@OneToMany(mappedBy="user",cascade = CascadeType.ALL)
+	private List<ActivityProgressEntity> progress = new ArrayList<ActivityProgressEntity>();
 
 
 
@@ -275,6 +278,44 @@ public class UserEntity implements UserDetails {
 	public boolean isEnabled() {
 	   
 	    return true;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public List<ActivityProgressEntity> getProgress() {
+		return progress;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setProgress(List<ActivityProgressEntity> progress) {
+		this.progress = progress;
 	}
 
 	

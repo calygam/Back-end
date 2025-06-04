@@ -8,7 +8,7 @@ import com.calygam.back.projections.ActivityProjection;
 @Component
 public class ActivityMapper {
 	
-	public  ActivityDTO toDTO(ActivityProjection p,Long count) {
+	public  ActivityDTO toDTO(ActivityProjection p,Long count,Long activitiesSize) {
 		ActivityDTO activityDTO = new ActivityDTO();
 		//caio <- vamos de maneira organizada mapear e isolar toda a parte que irá retornar na dto
 		activityDTO.setActivityId(p.getActivityId());
@@ -21,6 +21,9 @@ public class ActivityMapper {
 		activityDTO.setActivityUpdatedAt(p.getActivityUpdatedAt());
 		if(count != null && count !=0 && count>0) {
 		activityDTO.setActivityCont(count);
+		}
+		if(activitiesSize !=null && activitiesSize>=0) {
+			activityDTO.setActivitiesCompleted(activitiesSize);
 		}
 		
 		return activityDTO;

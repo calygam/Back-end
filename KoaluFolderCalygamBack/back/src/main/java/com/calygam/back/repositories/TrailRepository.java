@@ -1,6 +1,7 @@
 package com.calygam.back.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -36,16 +37,7 @@ public interface TrailRepository extends JpaRepository<TrailEntity, Long> {
   	    """)
 		List<TrailDTO> findAllTrailsWithActivitiesPerTeacher(@Param("userId") Long userId);
     
-    @Query("""
-			 SELECT NEW com.calygam.back.dtos.TrailDTO(
-				  t.trailId, t.trailName, t.archiveName,
-				 	t.trailDescription,t.trailPrice,
-			t.trailCreatedDate,t.trailUpdatedDate,t.trailVacancy,
-			t.trailVacancies,t.user.userId)
-			 FROM TrailEntity t WHERE  t.user.userId = :userId AND t.trailId = :trailId
-			""")
-	
-	TrailDTO findExistentTrailById(@Param("userId") Long userId,@Param("trailId") Long trailId);
+    Optional<TrailEntity> findById(Long trailId);
     
     
 }

@@ -29,6 +29,7 @@ public class ActivityDTO {
 	
 
 	private LocalDate activityUpdatedAt;
+	private Long activitiesCompleted;
 	
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private Long activityCont;
@@ -136,6 +137,16 @@ public class ActivityDTO {
 	public void setActivityCont(Long activityCont) {
 		this.activityCont = activityCont;
 	}
+
+	public Long getActivitiesCompleted() {
+		return activitiesCompleted;
+	}
+
+	public void setActivitiesCompleted(Long activitiesCompleted) {
+		this.activitiesCompleted = activitiesCompleted;
+	}
+	
+	
 	
 	
 	

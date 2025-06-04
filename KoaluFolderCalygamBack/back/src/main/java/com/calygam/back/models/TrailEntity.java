@@ -74,6 +74,9 @@ public class TrailEntity implements GenericFileManagement {
 	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<ActivityEntity> activities = new ArrayList<>();
 	
+	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<ActivityProgressEntity> progress = new ArrayList<>();
+	
 	
 	public TrailEntity() {
 		super();
@@ -266,6 +269,30 @@ public class TrailEntity implements GenericFileManagement {
 		// TODO Auto-generated method stub
 		return archiveType;
 	}
+
+
+
+
+
+
+
+
+	public List<ActivityProgressEntity> getProgress() {
+		return progress;
+	}
+
+
+
+
+
+
+
+
+	public void setProgress(List<ActivityProgressEntity> progress) {
+		this.progress = progress;
+	}
+	
+	
 
 
 

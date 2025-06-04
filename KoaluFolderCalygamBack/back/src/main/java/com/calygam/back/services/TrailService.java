@@ -5,6 +5,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -13,7 +14,6 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.calygam.back.dtos.ActivityDTO;
-import com.calygam.back.dtos.CodesCalygamDTO;
 import com.calygam.back.dtos.TrailDTO;
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.exceptions.UnauthorizedAcessUserException;
@@ -98,8 +98,11 @@ public class TrailService {
 		   return trails;
 	}
 	
-	public TrailDTO ReadTrailById(Long userId,Long trailId) {
-	    return trailRepository.findExistentTrailById(userId, trailId);
+	public TrailDTO ReadTrailById(Long trailId) {
+		   TrailEntity entity = trailRepository.findById(trailId)
+			        .orElseThrow(() -> new RuntimeException("Trail not found"));
+
+			    return new TrailDTO(entity);
 	}
 	
 	public TrailDTO updateInfoTrailByExistsId(Long userId,Long trailId,TrailDTO trailDTO) throws IOException  {
@@ -131,9 +134,13 @@ public class TrailService {
 		if(trailDTO.getTrailPrice() !=null) {
 			trailEntity.setTrailPrice(trailDTO.getTrailPrice());
 		}
-		if(trailDTO.getTrailPassword() !=null) {
-			String encrypitedPassword = new BCryptPasswordEncoder().encode(trailDTO.getTrailPassword());
-			trailEntity.setTrailPassword(encrypitedPassword);
+		if (trailDTO.getTrailPassword() != null && !trailDTO.getTrailPassword().isEmpty()) {
+		    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
+		    
+		    if (!encoder.matches(trailDTO.getTrailPassword(), trailEntity.getTrailPassword())) {
+		        String encryptedPassword = encoder.encode(trailDTO.getTrailPassword());
+		        trailEntity.setTrailPassword(encryptedPassword);
+		    }
 		}
 		trailEntity.setTrailUpdatedDate(LocalDate.now());
 		

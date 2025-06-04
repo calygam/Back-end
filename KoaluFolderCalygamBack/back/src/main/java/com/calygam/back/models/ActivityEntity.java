@@ -1,10 +1,13 @@
 package com.calygam.back.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.calygam.back.enums.DifficultyEnum;
 import com.calygam.back.enums.StatusOfLife;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,6 +15,7 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
@@ -47,6 +51,9 @@ public class ActivityEntity {
 	@ManyToOne
 	@JoinColumn(name="trail_id")
 	private TrailEntity trail;
+	
+	@OneToMany(mappedBy="activity",cascade=CascadeType.ALL,orphanRemoval=true)
+	private List<ActivityProgressEntity> progress = new ArrayList<>();
 
 	public ActivityEntity() {
 		super();
@@ -138,6 +145,16 @@ public class ActivityEntity {
 	public void setTrail(TrailEntity trail) {
 		this.trail = trail;
 	}
+
+	public List<ActivityProgressEntity> getProgress() {
+		return progress;
+	}
+
+	public void setProgress(List<ActivityProgressEntity> progress) {
+		this.progress = progress;
+	}
+	
+	
 	
 	
 	

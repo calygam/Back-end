@@ -46,12 +46,11 @@ public class TrailController {
 		
 		return trailService.ReadAllTrailsOfOneTeacher(userId);
 	}
-	/*@GetMapping("/read/{trailId}")
-	public TrailDTO ReadAllTrails(@RequestHeader("Authorization") String token,@PathVariable("trailId") Long trailId) {
-		token = token.replace("Bearer ","");
-		Long userId = jwtUtilsId.getUserIdFromToken(token);
-		return trailService.ReadTrailById(userId, trailId);
-	}*/
+	@GetMapping("/read/{trailId}")
+	public TrailDTO ReadAllTrails(@PathVariable("trailId") Long trailId) {
+
+		return trailService.ReadTrailById(trailId);
+	}
 	
 
 	@PutMapping("/update/{trailId}")

@@ -73,27 +73,12 @@ public class UsersServices {
 	public Optional<DataUtilUserDTO> ReadInfoUserByIdService(String token){
 		Long userId = jwtUtilsId.getUserIdFromToken(token);
 		Optional<DataUtilUserDTO> userResponseDTO = usersRepository.findByUserId(userId);
-		Optional<DataUtilUserDTO> userResponseDTONoTral = userResponseDTO;
-		DataUtilUserDTO dataUtilUserDTO = userResponseDTO.get();
-		Optional<UserEntity> userResponse = usersRepository.findUserPasswordById(userId);
 		
-		UserEntity userEntity = userResponse.get();
-		
-		userEntity.setUserName(dataUtilUserDTO.getUserName());
-		userEntity.setUserEmail(dataUtilUserDTO.getUserEmail());
-		userEntity.setUserCpf(dataUtilUserDTO.getUserCpf());
-		userEntity.setUserMoney(dataUtilUserDTO.getUserMoney());
-		userEntity.setXp(dataUtilUserDTO.getUserXp());
-		userEntity.setUserRole(userEntity.getUserRole());
-
-		userEntity.setUserPassword(userEntity.getUserPassword());
-		
-		usersRepository.save(userEntity);
 		
 		
 	    
 	  
-	    return userResponseDTONoTral;
+	    return userResponseDTO;
 		
 		
 		
