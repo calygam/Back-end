@@ -1,6 +1,9 @@
 package com.calygam.back.services;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
@@ -11,10 +14,12 @@ import org.springframework.stereotype.Service;
 
 import com.calygam.back.dtos.ActivityProgressDTO;
 import com.calygam.back.dtos.ActivityProgressResponseDTO;
+import com.calygam.back.exceptions.UserNotIdentifiedException;
 import com.calygam.back.mappers.ActivityProgressMapper;
 import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
+import com.calygam.back.projections.ActivityProgressProjection;
 import com.calygam.back.projections.ProgressAssignProjection;
 import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.TrailRepository;
@@ -22,6 +27,7 @@ import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.utils.GenerateProgress;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class ProgressActivityService {
@@ -44,6 +50,7 @@ public class ProgressActivityService {
 	@Autowired
 	private PasswordEncoder passwordEncoder;
 	
+	@Transactional
 	public List<ActivityProgressResponseDTO> progressAssignStudent(String trailPassword,Long userId, Long trailId)  {
 	    UserEntity userEntity = usersRepository.findEntityByUserId(userId)
 	        .orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
@@ -53,24 +60,27 @@ public class ProgressActivityService {
 	    AtomicInteger index = new AtomicInteger(0);
 	    
 	    if(passwordEncoder.matches(trailPassword, trailEntity.getTrailPassword())) {
-	    	System.out.println("AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA");
-	  
+	    	 Boolean hasProgress = progressRepository
+	    	            .existsByUserIdAndTrailId(userId, trailId);
+	    	if(!hasProgress) {
+	    	   
+	    		  List<ActivityProgressEntity> progressList = trailEntity.getActivities().stream()
+	    			        .map(activity -> {
+	    			            boolean isFirst = index.getAndIncrement() == 0;
 
-	    List<ActivityProgressEntity> progressList = trailEntity.getActivities().stream()
-	        .map(activity -> {
-	            boolean isFirst = index.getAndIncrement() == 0;
+	    			            ActivityProgressDTO dto = new ActivityProgressDTO();
+	    			            dto.setUser(userEntity);
+	    			            dto.setTrail(trailEntity);
+	    			            dto.setActivity(activity);
 
-	            ActivityProgressDTO dto = new ActivityProgressDTO();
-	            dto.setUser(userEntity);
-	            dto.setTrail(trailEntity);
-	            dto.setActivity(activity);
+	    			            return generateProgress.assignProgress(dto, isFirst);
+	    			        })
+	    			        .collect(Collectors.toList());
 
-	            return generateProgress.assignProgress(dto, isFirst);
-	        })
-	        .collect(Collectors.toList());
-
-	     progressRepository.saveAll(progressList);
-
+	    			     progressRepository.saveAll(progressList);
+	    	
+	    	    }
+	    	
 	    List<ProgressAssignProjection> progressProjections = progressRepository
 	            .findProgressByUserIdAndTrailId(userId, trailId);
 
@@ -79,9 +89,29 @@ public class ProgressActivityService {
 	            .map(p-> activityProgressMapper.convertToDTO(p))
 	            .collect(Collectors.toList());
 	    }else {
-	    	System.out.println("AOOOOOOOOOEOEOEOOEEEEE");
 	    	throw new BadCredentialsException("Senha incorreta para acesso à trilha.");
 	    }
 	}
+	
+	public Map<String, Object> findProgressOfOneUser(Long userId, Long trailId) {
+        List<ProgressAssignProjection> progressProjections = progressRepository
+                .findProgressByUserIdAndTrailId(userId, trailId);
+
+        Long activitiesCompleted = progressRepository.countTotalActivitiesCompleted(userId, trailId);
+
+        if (!progressProjections.isEmpty()) {
+            Map<String, Object> response = new HashMap<>();
+            response.put("progressList", progressProjections.stream()
+                    .map(p->activityProgressMapper.convertToDTO(p))
+                    .collect(Collectors.toList()));
+            response.put("activitiesCompleted", activitiesCompleted != null ? activitiesCompleted : 0L);
+            return response;
+        }
+        throw new UserNotIdentifiedException("O usuário não faz parte dessa trilha :/");
+    }
+	
+	 public Optional<ActivityProgressProjection> getCurrentActivityEnable(Long userId, Long trailId) {
+	        return progressRepository.findMostRecentActivityWithProgress(userId, trailId);
+	    }
 	
 }

@@ -9,6 +9,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.calygam.back.dtos.ActivityDTO;
+import com.calygam.back.projections.ActivityProjection;
 import com.calygam.back.services.ActivityService;
 
 
@@ -22,6 +23,11 @@ public class ActivityController {
 	@GetMapping("/trail/{trailId}")
 	public List<ActivityDTO> getActivitiesBy(@PathVariable Long trailId){
 		return activityService.findActivitiesPerTrailIdService(trailId);
+	}
+	@GetMapping("/trail/{trailId}/activity/{activityId}")
+	public ActivityDTO findActivityDetails(@PathVariable Long trailId,@PathVariable Long activityId){
+
+		return activityService.findActivityDetails(trailId, activityId);
 	}
 
 }

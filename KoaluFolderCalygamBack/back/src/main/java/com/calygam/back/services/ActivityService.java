@@ -38,4 +38,16 @@ public class ActivityService {
 		return activityDTOs;
 	}
 	
+	public ActivityDTO findActivityDetails(Long trailId,Long activityId){
+		ActivityProjection activities = activityRepository.findActivityDetails(trailId,activityId);
+	
+		
+
+		
+	
+		
+		return activityMapper.toDTOClean(activities);
+	}
+	
+	
 }

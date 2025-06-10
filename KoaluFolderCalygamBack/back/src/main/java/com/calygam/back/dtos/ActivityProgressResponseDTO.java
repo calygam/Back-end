@@ -6,6 +6,7 @@ import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 
 public class ActivityProgressResponseDTO {
@@ -19,6 +20,7 @@ public class ActivityProgressResponseDTO {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long unlockedActivities;
+  
 	
 	
 	
@@ -170,6 +172,11 @@ public class ActivityProgressResponseDTO {
 	public void setUnlockedActivities(Long unlockedActivities) {
 		this.unlockedActivities = unlockedActivities;
 	}
+
+
+
+
+
 	
 	
 	

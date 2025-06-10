@@ -30,4 +30,21 @@ public class ActivityMapper {
 		
 	}
 	
+	public  ActivityDTO toDTOClean(ActivityProjection p) {
+		ActivityDTO activityDTO = new ActivityDTO();
+		//caio <- vamos de maneira organizada mapear e isolar toda a parte que irá retornar na dto
+		activityDTO.setActivityId(p.getActivityId());
+		activityDTO.setActivityName(p.getActivityName());
+		activityDTO.setActivityDescription(p.getActivityDescription());
+		activityDTO.setActivityPrice(p.getActivityPrice());
+		activityDTO.setActivityDifficulty(p.getActivityDifficulty());
+		activityDTO.setActivityStatus(p.getActivityStatus());
+		activityDTO.setActivityCreatedAt(p.getActivityCreatedAt());
+		activityDTO.setActivityUpdatedAt(p.getActivityUpdatedAt());
+	
+		
+		return activityDTO;
+		
+	}
+	
 }

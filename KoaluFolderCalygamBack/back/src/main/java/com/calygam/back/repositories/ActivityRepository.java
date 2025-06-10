@@ -30,6 +30,22 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
 	List<ActivityProjection> findActivitiesPerTargetTrailId(@Param("trailId")Long trailId);
 	
 	@Query("""
+			SELECT 
+				atv.activityId AS activityId,
+				atv.activityName AS activityName,
+				atv.activityDescription AS activityDescription,
+				atv.activityPrice AS activityPrice,
+				atv.activityDifficulty AS activityDifficulty,
+				atv.activityStatus AS activityStatus,
+				atv.activityCreatedAt AS activityCreatedAt,
+				atv.activityUpdatedAt AS activityUpdatedAt
+			FROM ActivityEntity atv
+			WHERE atv.trail.id = :trailId AND atv.activityId = :activityId
+				
+			""")
+	ActivityProjection findActivityDetails(@Param("trailId") Long trailId,@Param("activityId") Long activityId);
+	
+	@Query("""
 			SELECT COUNT(atv) 
 			FROM ActivityEntity atv
 			WHERE atv.trail.id = :trailId

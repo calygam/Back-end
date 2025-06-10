@@ -17,5 +17,10 @@ public class SoftGlobalExceptions {
 		return new ResponseEntity<>(ex.getMessage(),HttpStatus.UNAUTHORIZED);
 	}
 	
+	@ExceptionHandler(UserNotIdentifiedException.class)
+	public ResponseEntity<String> GlobalUserNotIdentifiedException(UserNotIdentifiedException ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
+	
 	
 }

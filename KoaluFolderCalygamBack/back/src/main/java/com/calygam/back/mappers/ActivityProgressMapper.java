@@ -18,6 +18,8 @@ public class ActivityProgressMapper {
         dto.setCreatedAt(projection.getCreatedAt());
         dto.setUpdatedAt(projection.getUpdatedAt());
         dto.setUnlockedActivities(projection.getUnlockedActivities());
+     
         return dto;
+  
     }
 }
