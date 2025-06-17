@@ -55,7 +55,7 @@ public class UserEntity implements UserDetails {
 	
 
 	
-	@Column(name="user_cpf",nullable=false)
+	@Column(name="user_cpf",nullable=true)
 	@CPF(message="calygam<- CPF inválido")
 	private String userCpf;
 	

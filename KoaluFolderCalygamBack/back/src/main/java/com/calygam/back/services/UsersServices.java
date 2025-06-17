@@ -6,6 +6,7 @@ import java.util.Optional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import com.calygam.back.dtos.DataUtilUserDTO;
 import com.calygam.back.dtos.RegisterDTO;
@@ -13,9 +14,12 @@ import com.calygam.back.dtos.RegisterResponseDTO;
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.exceptions.UserAlreadExistsException;
+import com.calygam.back.exceptions.UserServiceException;
 import com.calygam.back.models.UserEntity;
+import com.calygam.back.projections.AdminAnalisisProjection;
 import com.calygam.back.repositories.UserAuthRepository;
 import com.calygam.back.repositories.UsersRepository;
+
 
 
 @Service
@@ -29,8 +33,6 @@ public class UsersServices {
 	
 	@Autowired
 	private JwtUtilsId jwtUtilsId;
-	
-	
 	
 	public RegisterResponseDTO CreateANewUser(RegisterDTO registerDTO) {
 		
@@ -52,37 +54,64 @@ public class UsersServices {
 		String encrypitedPassword = new BCryptPasswordEncoder().encode(registerDTO.getUserPassword());
 		userEntity.setUserPassword(encrypitedPassword);
 		
-		
 		userEntity = userAuthRepository.save(userEntity);
-		
 		RegisterResponseDTO userResponseDTO = new RegisterResponseDTO();
-		
 		userResponseDTO.setId(userEntity.getUserId());
 		userResponseDTO.setUserName(userEntity.getUsername());
 		userResponseDTO.setUserCpf(userEntity.getUserCpf());
 		userResponseDTO.setUserEmail(userEntity.getUserEmail());
 	    String userRank = UserRankEnum.getRankForXpToString(userEntity.getXp());
 	    userResponseDTO.setUserRank(userRank);
-		
-		return userResponseDTO;
-		
-		
-		
+		return userResponseDTO;	
 	}
 	
 	public Optional<DataUtilUserDTO> ReadInfoUserByIdService(String token){
 		Long userId = jwtUtilsId.getUserIdFromToken(token);
 		Optional<DataUtilUserDTO> userResponseDTO = usersRepository.findByUserId(userId);
-		
-		
-		
-	    
-	  
 	    return userResponseDTO;
-		
-		
-		
 	}
+	
+	
+	
+	//caio<- COM O GOOGLE 
+	
+	@Transactional
+	public UserEntity createGoogleUserService(String email, String name, String id, String picture) throws UserServiceException {
+		try {
+			Integer xp = 0;
+			UserEntity user = new UserEntity();
+			user.setUserName(name);
+			
+			user.setXp(xp);
+			user.setUserRole(UserRoleEnum.ALUNO);
+			user.setUserEmail(email);
+			user.setuserProviderId(id);
+			user.setuserImagePerfil(picture);
+			return usersRepository.save(user);
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao criar usuário Google", e);
+		}
+	}
+	
+	public UserEntity readUserGoogleService(String email) throws UserServiceException {
+		try {
+			UserEntity userIdentified = userAuthRepository.findByUserEmail(email);
+			if(userIdentified==null) {
+				throw new UserAlreadExistsException("Usuário não enontrado");
+			}
+			return userIdentified;
+		} catch (Exception e) {
+			throw new UserServiceException("Erro ao ler usuário Google", e);
+		}
+	}
+	
+	public AdminAnalisisProjection getTotalAnalisisAdminService() {
+		return usersRepository.getTotalAnalisisAdmin();
+	}
+	
+	
+	
+	
 	
 	
 }

@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.calygam.back.dtos.DataUtilUserDTO;
+import com.calygam.back.projections.AdminAnalisisProjection;
 import com.calygam.back.services.UsersServices;
 
 @RestController
@@ -26,5 +27,9 @@ public class UsersController {
 		token = token.replace("Bearer ", "");
 		Optional<DataUtilUserDTO> user = usersServices.ReadInfoUserByIdService(token);
 		return ResponseEntity.ok(user);
+	}
+	@GetMapping("/dash/count/admin")
+	public ResponseEntity<AdminAnalisisProjection> getTotalAnalisisAdminController(){
+		return ResponseEntity.ok(usersServices.getTotalAnalisisAdminService());
 	}
 }
