@@ -4,6 +4,8 @@ import java.math.BigInteger;
 import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -107,6 +109,23 @@ public class UsersServices {
 	
 	public AdminAnalisisProjection getTotalAnalisisAdminService() {
 		return usersRepository.getTotalAnalisisAdmin();
+	}
+	
+	public ResponseEntity<String> assignTeacherToProject(String email) {
+		
+			UserEntity userIdentified = userAuthRepository.findByUserEmail(email);
+			if(userIdentified==null) {
+				throw new UserAlreadExistsException("Usuário não enontrado");
+			}
+			if(userIdentified.getUserRole().ordinal()==2) {
+				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este usuário já é um professor");
+			}else {
+				userIdentified.setUserRole(UserRoleEnum.INSTRUTOR);
+				usersRepository.save(userIdentified);
+				return ResponseEntity.status(HttpStatus.OK).body("Designado o titulo de professor = novo membro ao time");
+			}
+			
+			
 	}
 	
 	

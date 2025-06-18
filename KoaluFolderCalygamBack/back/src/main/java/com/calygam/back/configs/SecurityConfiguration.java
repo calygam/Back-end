@@ -33,6 +33,7 @@ public class SecurityConfiguration {
 						.requestMatchers(HttpMethod.POST,"/progress/join/**").authenticated()
 						.requestMatchers(HttpMethod.GET,"/auth/google").permitAll()
 						.requestMatchers(HttpMethod.GET,"/auth/google/callback").permitAll()
+						.requestMatchers(HttpMethod.PUT,"/users/teacher/**").hasRole("COORDENADOR")
 						.requestMatchers("/file/read/**").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(mySecurityFilter, UsernamePasswordAuthenticationFilter.class)
