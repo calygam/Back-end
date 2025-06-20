@@ -45,7 +45,7 @@ public class RegisterResponseDTO {
 	}
 	
 	//caio<- trazendo apenas o necessario na resposta: 
-	public RegisterResponseDTO(UserEntity entity,Integer xp) {
+	public RegisterResponseDTO(UserEntity entity,Long xp) {
 		id = entity.getUserId();
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();

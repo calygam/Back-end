@@ -1,34 +1,37 @@
 package com.calygam.back.dtos;
 
-import java.math.BigInteger;
 import java.util.List;
 import java.util.stream.Collectors;
 
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
-import com.calygam.back.models.TrailEntity;
+import com.calygam.back.enums.UserStatus;
 import com.calygam.back.models.UserEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class DataUtilUserDTO {
 		
-	private Long id;
+	private Long userId;
 	private String userName;
 	private String userEmail;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String userCpf;
-	private Integer userXp;
+	private Long userXp;
 	private String userRank;	
 	private Integer userRankPoints;
 	private String userImage;
 	private UserRoleEnum userRole;
-	private BigInteger userMoney;
+	private Long userMoney;
 	private List<TrailDTO> trails;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private UserStatus userStatus;
 	public DataUtilUserDTO() {
 		super();
 	}
-	public DataUtilUserDTO(Long id, String userName, String userEmail, String userCpf, Integer userXp,
-			String userImage, UserRoleEnum userRole, BigInteger userMoney) {
+	public DataUtilUserDTO(Long userId, String userName, String userEmail, String userCpf, Long userXp,
+			String userImage, UserRoleEnum userRole, Long userMoney) {
 		super();
-		this.id = id;
+		this.userId = userId;
 		this.userName = userName;
 		this.userEmail = userEmail;
 		this.userCpf = userCpf;
@@ -47,7 +50,7 @@ public class DataUtilUserDTO {
 	
 	public DataUtilUserDTO(UserEntity entity) {
 		super();
-		id = entity.getUserId();
+		userId = entity.getUserId();
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();
 		userCpf = entity.getUserCpf();
@@ -63,11 +66,11 @@ public class DataUtilUserDTO {
                 : List.of(); 
 	}
 	
-	public Long getId() {
-		return id;
+	public Long getUserId() {
+		return userId;
 	}
-	public void setId(Long id) {
-		this.id = id;
+	public void setUserId(Long id) {
+		this.userId = id;
 	}
 	public String getUserName() {
 		return userName;
@@ -87,10 +90,10 @@ public class DataUtilUserDTO {
 	public void setUserCpf(String userCpf) {
 		this.userCpf = userCpf;
 	}
-	public Integer getUserXp() {
+	public Long getUserXp() {
 		return userXp;
 	}
-	public void setUserXp(Integer userXp) {
+	public void setUserXp(Long userXp) {
 		this.userXp = userXp;
 	}
 	public String getUserRank() {
@@ -105,10 +108,10 @@ public class DataUtilUserDTO {
 	public void setUserImage(String userImage) {
 		this.userImage = userImage;
 	}
-	public BigInteger getUserMoney() {
+	public Long getUserMoney() {
 		return userMoney;
 	}
-	public void setUserMoney(BigInteger userMoney) {
+	public void setUserMoney(Long userMoney) {
 		this.userMoney = userMoney;
 	}
 	public Integer getUserRankPoints() {
@@ -129,6 +132,14 @@ public class DataUtilUserDTO {
 	public void setUserRole(UserRoleEnum userRole) {
 		this.userRole = userRole;
 	}
+	public UserStatus getUserStatus() {
+		return userStatus;
+	}
+	public void setUserStatus(UserStatus userStatus) {
+		this.userStatus = userStatus;
+	}
+	
+	
 	
 	
 	

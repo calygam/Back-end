@@ -1,9 +1,12 @@
 package com.calygam.back.services;
 
-import java.math.BigInteger;
+
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
@@ -15,10 +18,13 @@ import com.calygam.back.dtos.RegisterDTO;
 import com.calygam.back.dtos.RegisterResponseDTO;
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
+import com.calygam.back.enums.UserStatus;
 import com.calygam.back.exceptions.UserAlreadExistsException;
 import com.calygam.back.exceptions.UserServiceException;
+import com.calygam.back.mappers.UserMappers;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.projections.AdminAnalisisProjection;
+import com.calygam.back.projections.TeacherDashProjection;
 import com.calygam.back.repositories.UserAuthRepository;
 import com.calygam.back.repositories.UsersRepository;
 
@@ -32,6 +38,9 @@ public class UsersServices {
 	
 	@Autowired
 	private UsersRepository usersRepository;
+	
+	@Autowired
+	private UserMappers userMappers;
 	
 	@Autowired
 	private JwtUtilsId jwtUtilsId;
@@ -48,9 +57,10 @@ public class UsersServices {
 		
 		userEntity.setUserName(registerDTO.getUserName());
 		userEntity.setUserEmail(registerDTO.getUserEmail());
-		userEntity.setUserCpf(registerDTO.getUserCpf());
-		userEntity.setUserMoney(new BigInteger("0"));
-		Integer xp = 0;
+		userEntity.setUserCpf(null);
+		userEntity.setUserMoney(0L);
+		userEntity.setUserStatus(UserStatus.ACTIVE);
+		Long xp = 0L;
 		userEntity.setXp(xp);
 		userEntity.setUserRole(UserRoleEnum.ALUNO);
 		String encrypitedPassword = new BCryptPasswordEncoder().encode(registerDTO.getUserPassword());
@@ -64,6 +74,7 @@ public class UsersServices {
 		userResponseDTO.setUserEmail(userEntity.getUserEmail());
 	    String userRank = UserRankEnum.getRankForXpToString(userEntity.getXp());
 	    userResponseDTO.setUserRank(userRank);
+	    
 		return userResponseDTO;	
 	}
 	
@@ -73,6 +84,14 @@ public class UsersServices {
 	    return userResponseDTO;
 	}
 	
+	public Page<DataUtilUserDTO> ReadInfoUsersByRole(Pageable pageable){
+
+		Page<TeacherDashProjection> teacherPages = usersRepository.findTeachersByRole(pageable);
+				
+	    return teacherPages.map(tea-> userMappers.toDTO(tea));
+	}
+	
+
 	
 	
 	//caio<- COM O GOOGLE 
@@ -80,13 +99,15 @@ public class UsersServices {
 	@Transactional
 	public UserEntity createGoogleUserService(String email, String name, String id, String picture) throws UserServiceException {
 		try {
-			Integer xp = 0;
+			Long xp = 0L;
 			UserEntity user = new UserEntity();
 			user.setUserName(name);
 			
 			user.setXp(xp);
 			user.setUserRole(UserRoleEnum.ALUNO);
+			user.setUserMoney(0L);
 			user.setUserEmail(email);
+			user.setUserStatus(UserStatus.ACTIVE);
 			user.setuserProviderId(id);
 			user.setuserImagePerfil(picture);
 			return usersRepository.save(user);

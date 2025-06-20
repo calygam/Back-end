@@ -43,7 +43,7 @@ public enum UserRankEnum {
 	public String getNameRank() {
 		return nameRank;
 	}
-	public static Integer getRankForXpPoints(int xp) {
+	public static Integer getRankForXpPoints(Long xp) {
 		Integer bestRank = BRONZEI.getPoints();
         
         for (UserRankEnum rank : UserRankEnum.values()) {
@@ -57,7 +57,7 @@ public enum UserRankEnum {
         return bestRank;
     }
 
-	public static UserRankEnum getRankForXp(int xp) {
+	public static UserRankEnum getRankForXp(Long xp) {
         UserRankEnum bestRank = BRONZEI;
         
         for (UserRankEnum rank : UserRankEnum.values()) {
@@ -70,7 +70,7 @@ public enum UserRankEnum {
         return bestRank;
     }
 	
-	public static String getRankForXpToString(int xp) {
+	public static String getRankForXpToString(Long xp) {
         String bestRank = BRONZEI.getNameRank();
         
         for (UserRankEnum rank : UserRankEnum.values()) {

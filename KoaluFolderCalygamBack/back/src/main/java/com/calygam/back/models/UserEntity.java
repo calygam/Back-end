@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
+import com.calygam.back.enums.UserStatus;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -60,9 +61,9 @@ public class UserEntity implements UserDetails {
 	private String userCpf;
 	
 	@Column(name="user_money")
-	private BigInteger userMoney;
+	private Long userMoney;
 	@Column(name="user_xp")
-	private Integer xp;
+	private Long xp;
 	
 	
 	@Column(name="user_rank")
@@ -71,6 +72,9 @@ public class UserEntity implements UserDetails {
 	
 	@Column(name="user_role")
 	private UserRoleEnum userRole;
+	
+	@Column(name="user_status")
+	private UserStatus userStatus;
 	
 
 	@OneToMany(mappedBy="user", cascade=CascadeType.ALL)
@@ -105,10 +109,13 @@ public class UserEntity implements UserDetails {
 
 
 
+	
+
 	public UserEntity(Long userId, String userProviderId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
 			String userPassword, String userImagePerfil, @CPF(message = "calygam<- CPF inválido") String userCpf,
-			BigInteger userMoney, Integer xp, UserRankEnum userRank, UserRoleEnum userRole, List<TrailEntity> trails) {
+			Long userMoney, Long xp, UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus,
+			List<TrailEntity> trails, List<ActivityProgressEntity> progress) {
 		super();
 		this.userId = userId;
 		this.userProviderId = userProviderId;
@@ -121,8 +128,27 @@ public class UserEntity implements UserDetails {
 		this.xp = xp;
 		this.userRank = userRank;
 		this.userRole = userRole;
+		this.userStatus = userStatus;
 		this.trails = trails;
+		this.progress = progress;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	public Long getUserId() {
 		return userId;
@@ -169,19 +195,19 @@ public class UserEntity implements UserDetails {
 		this.userCpf = userCpf;
 	}
 
-	public Integer getXp() {
+	public Long getXp() {
 		return xp;
 	}
 
-	public void setXp(Integer xp) {
+	public void setXp(Long xp) {
 		this.xp = xp;
 		 this.userRank = UserRankEnum.getRankForXp(xp);
 	}
-	public BigInteger getUserMoney() {
+	public Long getUserMoney() {
 		return userMoney;
 	}
 
-	public void setUserMoney(BigInteger userMoney) {
+	public void setUserMoney(Long userMoney) {
 		this.userMoney = userMoney;
 	}
 
@@ -279,6 +305,34 @@ public class UserEntity implements UserDetails {
 	   
 	    return true;
 	}
+
+
+	public UserStatus getUserStatus() {
+		return userStatus;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setUserStatus(UserStatus userStatus) {
+		this.userStatus = userStatus;
+	}
+
+
 
 
 
