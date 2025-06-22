@@ -62,4 +62,9 @@ public class UsersController {
 		return usersServices.assignTeacherToProject(teacherEmail);
 		
 	}
+	@PutMapping("/teacher/remove/{teacherEmail}")
+	public ResponseEntity<String> removeTeacherOfProjectController(@PathVariable String teacherEmail){
+		return usersServices.removeTeacherOfProject(teacherEmail);
+		
+	}
 }

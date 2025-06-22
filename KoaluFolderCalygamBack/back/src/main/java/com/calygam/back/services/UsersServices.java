@@ -20,6 +20,7 @@ import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.enums.UserStatus;
 import com.calygam.back.exceptions.UserAlreadExistsException;
+import com.calygam.back.exceptions.UserNotIdentifiedException;
 import com.calygam.back.exceptions.UserServiceException;
 import com.calygam.back.mappers.UserMappers;
 import com.calygam.back.models.UserEntity;
@@ -57,7 +58,7 @@ public class UsersServices {
 		
 		userEntity.setUserName(registerDTO.getUserName());
 		userEntity.setUserEmail(registerDTO.getUserEmail());
-		userEntity.setUserCpf(null);
+		userEntity.setUserCpf(registerDTO.getUserCpf());
 		userEntity.setUserMoney(0L);
 		userEntity.setUserStatus(UserStatus.ACTIVE);
 		Long xp = 0L;
@@ -135,11 +136,11 @@ public class UsersServices {
 	public ResponseEntity<String> assignTeacherToProject(String email) {
 		
 			UserEntity userIdentified = userAuthRepository.findByUserEmail(email);
-			if(userIdentified==null) {
-				throw new UserAlreadExistsException("Usuário não enontrado");
+			if(userIdentified==null ) {
+				throw new UserNotIdentifiedException("Usuário não encontrado");
 			}
 			if(userIdentified.getUserRole().ordinal()==2) {
-				return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Este usuário já é um professor");
+			   throw new  UserAlreadExistsException("Este usuário já é um professor");
 			}else {
 				userIdentified.setUserRole(UserRoleEnum.INSTRUTOR);
 				usersRepository.save(userIdentified);
@@ -148,6 +149,23 @@ public class UsersServices {
 			
 			
 	}
+	public ResponseEntity<String> removeTeacherOfProject(String email) {
+		
+		UserEntity userIdentified = userAuthRepository.findByUserEmail(email);
+		if(userIdentified==null ) {
+			throw new UserNotIdentifiedException("Usuário não encontrado");
+		}
+		if(userIdentified.getUserRole().ordinal()!=2) {
+		   throw new  UserNotIdentifiedException("Este usuário não é um professor");
+		}else {
+			userIdentified.setUserRole(UserRoleEnum.ALUNO);
+			usersRepository.save(userIdentified);
+			return ResponseEntity.status(HttpStatus.OK).body("Um professor deixou seu cargo");
+		}
+		
+		
+}
+	
 	
 	
 	
