@@ -9,7 +9,7 @@ import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ActivityDTO {
 
-	private Integer activityId;
+	private Long activityId;
 
 	private String activityName;
 
@@ -38,7 +38,7 @@ public class ActivityDTO {
 		super();
 	}
 
-	public ActivityDTO(Integer activityId, String activityName, String activityDescription, Integer activityPrice,
+	public ActivityDTO(Long activityId, String activityName, String activityDescription, Integer activityPrice,
 			DifficultyEnum activityDifficulty, StatusOfLife activityStatus, LocalDate activityCreatedAt,
 			LocalDate activityUpdatedAt) {
 		super();
@@ -66,11 +66,11 @@ public class ActivityDTO {
 	
 	
 
-	public Integer getActivityId() {
+	public Long getActivityId() {
 		return activityId;
 	}
 
-	public void setActivityId(Integer activityId) {
+	public void setActivityId(Long activityId) {
 		this.activityId = activityId;
 	}
 

@@ -162,7 +162,7 @@ public class TrailService {
 		//caio<- agora vem a lógica para atualizarmos as atividades ou criar novas atividades
 		if (trailDTO.getActivities() != null && !trailDTO.getActivities().isEmpty()) {
 		    // Mapear as atividades existentes da trilha
-		    Map<Integer, ActivityEntity> activitiesPresentInBase = trailEntity.getActivities().stream()
+		    Map<Long, ActivityEntity> activitiesPresentInBase = trailEntity.getActivities().stream()
 		            .collect(Collectors.toMap(ActivityEntity::getActivityId, Function.identity()));
 
 		    List<ActivityEntity> updatedActivities = new ArrayList<>();

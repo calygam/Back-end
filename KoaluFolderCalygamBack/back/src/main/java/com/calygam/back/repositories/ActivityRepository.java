@@ -1,6 +1,7 @@
 package com.calygam.back.repositories;
 
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.data.jpa.repository.Query;
@@ -52,5 +53,10 @@ public interface ActivityRepository extends JpaRepository<ActivityEntity, Long> 
 			"""
 			)
 	Long countTotalActivitiesByTrailId(@Param("trailId")Long trailId);
+	
+	@Query("""
+			SELECT atv FROM ActivityEntity atv WHERE atv.trail.trailId = :trailId AND atv.activityId = :activityId
+			""")
+	Optional<ActivityEntity> findActivityByTrailIdAndActivityId(@Param("activityId") Long activityId, @Param("trailId") Long trailId);
 	
 }

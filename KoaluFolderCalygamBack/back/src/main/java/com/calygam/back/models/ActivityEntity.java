@@ -25,7 +25,7 @@ public class ActivityEntity {
 	@GeneratedValue(strategy= GenerationType.IDENTITY)
 	
 	@Column(name="activity_id")
-	private Integer activityId;
+	private Long activityId;
 	
 	@Column(name="activity_name")
 	private String activityName;
@@ -59,7 +59,7 @@ public class ActivityEntity {
 		super();
 	}
 
-	public ActivityEntity(Integer activityId, String activityName, String activityDescription, Integer activityPrice,
+	public ActivityEntity(Long activityId, String activityName, String activityDescription, Integer activityPrice,
 			DifficultyEnum activityDifficulty, StatusOfLife activityStatus, LocalDate activityCreatedAt,
 			LocalDate activityUpdatedAt, TrailEntity trail) {
 		super();
@@ -74,11 +74,11 @@ public class ActivityEntity {
 		this.trail = trail;
 	}
 
-	public Integer getActivityId() {
+	public Long getActivityId() {
 		return activityId;
 	}
 
-	public void setActivityId(Integer activityId) {
+	public void setActivityId(Long activityId) {
 		this.activityId = activityId;
 	}
 

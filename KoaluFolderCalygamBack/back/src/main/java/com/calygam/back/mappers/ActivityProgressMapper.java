@@ -1,9 +1,13 @@
 package com.calygam.back.mappers;
 
 import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.calygam.back.dtos.ActivityProgressResponseDTO;
+import com.calygam.back.dtos.ProgressSubmitActivityDTO;
 import com.calygam.back.projections.ProgressAssignProjection;
+import com.calygam.back.projections.SubmitedProgressProjection;
+
 
 @Component
 public class ActivityProgressMapper {
@@ -18,8 +22,14 @@ public class ActivityProgressMapper {
         dto.setCreatedAt(projection.getCreatedAt());
         dto.setUpdatedAt(projection.getUpdatedAt());
         dto.setUnlockedActivities(projection.getUnlockedActivities());
+        dto.setActivitySubmitedFile(ServletUriComponentsBuilder
+                .fromCurrentContextPath()
+                .path("/file/read/progress/")         
+                .path(projection.getArchiveName())
+                .toUriString());
      
         return dto;
   
-    }
+  
+}
 }

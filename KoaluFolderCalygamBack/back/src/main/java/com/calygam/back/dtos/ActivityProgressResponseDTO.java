@@ -20,6 +20,9 @@ public class ActivityProgressResponseDTO {
     private LocalDate createdAt;
     private LocalDate updatedAt;
     private Long unlockedActivities;
+    
+    @JsonInclude(JsonInclude.Include.NON_NULL)
+    private String activitySubmitedFile;
   
 	
 	
@@ -171,6 +174,20 @@ public class ActivityProgressResponseDTO {
 
 	public void setUnlockedActivities(Long unlockedActivities) {
 		this.unlockedActivities = unlockedActivities;
+	}
+
+
+
+
+	public String getActivitySubmitedFile() {
+		return activitySubmitedFile;
+	}
+
+
+
+
+	public void setActivitySubmitedFile(String activitySubmitedFile) {
+		this.activitySubmitedFile = activitySubmitedFile;
 	}
 
 

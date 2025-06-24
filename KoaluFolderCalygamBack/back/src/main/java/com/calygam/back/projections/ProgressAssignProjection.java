@@ -14,5 +14,6 @@ public interface ProgressAssignProjection {
     LocalDate getCreatedAt();
     LocalDate getUpdatedAt();
     Long getUnlockedActivities();
+    String getArchiveName();
 	
 }

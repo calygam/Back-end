@@ -3,6 +3,7 @@ package com.calygam.back.models;
 import java.time.LocalDate;
 
 import com.calygam.back.enums.StatusOfLife;
+import com.calygam.back.utils.GenericFileManagement;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -15,7 +16,7 @@ import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tb_trail_x_activity_progress")
-public class ActivityProgressEntity {
+public class ActivityProgressEntity implements GenericFileManagement {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -47,16 +48,22 @@ public class ActivityProgressEntity {
 	@Column(name="unlocked_activities")
 	private Long unlockedActivities;
 	
+	@Column(name="submit_archive_name")
+	private String archiveName;
 	
-
+	@Column(name="submit_original_name")
+	private String originalName;
+	
+	@Column(name="submit_archive_path")
+	private String archivePath;
+	
+	@Column(name="submit_archive_type")
+	private String archiveType;
+	
+	
 	public ActivityProgressEntity() {
 		super();
 	}
-
-
-
-
-
 
 
 	public ActivityProgressEntity(Long progressId, UserEntity user, TrailEntity trail, ActivityEntity activity,
@@ -73,11 +80,6 @@ public class ActivityProgressEntity {
 		this.updatedAt = updatedAt;
 		this.unlockedActivities = unlockedActivities;
 	}
-
-
-
-
-
 
 
 	public Long getProgressId() {
@@ -152,14 +154,49 @@ public class ActivityProgressEntity {
 		this.updatedAt = updatedAt;
 	}
 
-
-
-
-
-
-
 	public Long getUnlockedActivities() {
 		return unlockedActivities;
+	}
+
+	public void setUnlockedActivities(Long unlockedActivities) {
+		this.unlockedActivities = unlockedActivities;
+	}
+
+	public String getArchiveName() {
+		return archiveName;
+	}
+
+
+	public void setArchiveName(String archiveName) {
+		this.archiveName = archiveName;
+	}
+
+
+
+	public String getOriginalName() {
+		return originalName;
+	}
+
+
+	public void setOriginalName(String originalName) {
+		this.originalName = originalName;
+	}
+
+
+
+	public String getArchivePath() {
+		return archivePath;
+	}
+
+
+	public void setArchivePath(String archivePath) {
+		this.archivePath = archivePath;
+	}
+
+
+
+	public String getArchiveType() {
+		return archiveType;
 	}
 
 
@@ -168,8 +205,8 @@ public class ActivityProgressEntity {
 
 
 
-	public void setUnlockedActivities(Long unlockedActivities) {
-		this.unlockedActivities = unlockedActivities;
+	public void setArchiveType(String archiveType) {
+		this.archiveType = archiveType;
 	}
 	
 	

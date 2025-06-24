@@ -21,6 +21,11 @@ public class SoftGlobalExceptions {
 	public ResponseEntity<String> GlobalUserNotIdentifiedException(UserNotIdentifiedException ex){
 		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
 	}
+	@ExceptionHandler(ExcededMaxDelimiter.class)
+	public ResponseEntity<String> GlobalExcededMaxDelimiter(ExcededMaxDelimiter ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
+	
 	
 	
 }

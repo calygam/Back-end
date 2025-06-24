@@ -6,7 +6,7 @@ import com.calygam.back.enums.DifficultyEnum;
 import com.calygam.back.enums.StatusOfLife;
 
 public interface ActivityProjection {
-	Integer getActivityId();
+	Long getActivityId();
 	String getActivityName();
 	String getActivityDescription();
 	Integer getActivityPrice();

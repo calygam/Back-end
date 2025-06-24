@@ -8,6 +8,7 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 
@@ -19,9 +20,20 @@ public class ArchiveController {
 
 	    @Autowired
 	    private TrailRepository trailRepository;
+	    @Autowired
+	    private ProgressRepository progressRepository;
 
-	    @GetMapping("/read/{archiveName}")
+	    @GetMapping("/read/{archiveName:.+}")
 	    public ResponseEntity<Resource> downloadTrailArchive(@PathVariable String archiveName) {
+	        System.out.println("🔍 Arquivo requisitado: " + archiveName);
 	        return uploadService.downloadArchive(archiveName, trailRepository);
+	    }
+	    
+	   
+
+	    @GetMapping("/read/progress/{archiveName:.+}")
+	    public ResponseEntity<Resource> downloadProgressArchive(@PathVariable String archiveName) {
+	        System.out.println("🔍 Arquivo requisitado: " + archiveName);
+	        return uploadService.downloadArchive(archiveName, progressRepository);
 	    }
 }
