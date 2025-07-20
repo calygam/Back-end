@@ -14,7 +14,7 @@ public class ActivityMapper {
 		activityDTO.setActivityId(p.getActivityId());
 		activityDTO.setActivityName(p.getActivityName());
 		activityDTO.setActivityDescription(p.getActivityDescription());
-		activityDTO.setActivityPrice(p.getActivityPrice());
+	
 		activityDTO.setActivityDifficulty(p.getActivityDifficulty());
 		activityDTO.setActivityStatus(p.getActivityStatus());
 		activityDTO.setActivityCreatedAt(p.getActivityCreatedAt());
@@ -36,7 +36,7 @@ public class ActivityMapper {
 		activityDTO.setActivityId(p.getActivityId());
 		activityDTO.setActivityName(p.getActivityName());
 		activityDTO.setActivityDescription(p.getActivityDescription());
-		activityDTO.setActivityPrice(p.getActivityPrice());
+	
 		activityDTO.setActivityDifficulty(p.getActivityDifficulty());
 		activityDTO.setActivityStatus(p.getActivityStatus());
 		activityDTO.setActivityCreatedAt(p.getActivityCreatedAt());

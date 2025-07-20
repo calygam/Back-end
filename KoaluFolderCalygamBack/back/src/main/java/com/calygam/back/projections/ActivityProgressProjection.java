@@ -10,6 +10,9 @@ package com.calygam.back.projections;
 	    String getActivityName();
 	    String getActivityDescription();
 	    String getActivityDifficulty();
-	    Double getActivityPrice();
+	    Long getRewardPackageMoney();
+	    Long getRewardPackageXp();
+	    Long getRewardPackageFood();
+	 
 	}
 

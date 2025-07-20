@@ -34,7 +34,13 @@ public class SecurityConfiguration {
 						.requestMatchers(HttpMethod.GET,"/auth/google").permitAll()
 						.requestMatchers(HttpMethod.GET,"/auth/google/callback").permitAll()
 						.requestMatchers(HttpMethod.PUT,"/users/teacher/**").hasRole("COORDENADOR")
-						.requestMatchers("/file/read/**").permitAll()
+						.requestMatchers(HttpMethod.POST,"/pet/admin/creating").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.PUT,"/pet/admin/creating/new/skin/{petId}").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST,"/emporium/add/item").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST,"/reward/create").hasRole("ADMIN")
+						.requestMatchers(HttpMethod.POST,"/emporium/purchase/obtain/item/{emporiumItemId}/type/{emporiumItemCatalogType}").hasRole("ALUNO")
+						
+						.requestMatchers("/file/**").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(mySecurityFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();

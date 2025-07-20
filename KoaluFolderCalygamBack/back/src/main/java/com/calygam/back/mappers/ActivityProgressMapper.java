@@ -22,11 +22,7 @@ public class ActivityProgressMapper {
         dto.setCreatedAt(projection.getCreatedAt());
         dto.setUpdatedAt(projection.getUpdatedAt());
         dto.setUnlockedActivities(projection.getUnlockedActivities());
-        dto.setActivitySubmitedFile(ServletUriComponentsBuilder
-                .fromCurrentContextPath()
-                .path("/file/read/progress/")         
-                .path(projection.getArchiveName())
-                .toUriString());
+      
      
         return dto;
   

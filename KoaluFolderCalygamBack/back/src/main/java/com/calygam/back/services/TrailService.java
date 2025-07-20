@@ -16,11 +16,14 @@ import org.springframework.stereotype.Service;
 import com.calygam.back.dtos.ActivityDTO;
 import com.calygam.back.dtos.TrailDTO;
 import com.calygam.back.enums.StatusOfLife;
+import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.exceptions.UnauthorizedAcessUserException;
 import com.calygam.back.exceptions.UserAlreadExistsException;
 import com.calygam.back.models.ActivityEntity;
+import com.calygam.back.models.RewardPackageEntity;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
+import com.calygam.back.repositories.RewardRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
@@ -37,6 +40,9 @@ public class TrailService {
 	UsersRepository usersRepository;
 	
 	@Autowired
+	private RewardRepository rewardRepository;
+	
+	@Autowired
 	private MakeUploadAndDownloadArchive makeUploadAndDownloadArchive;
 	
 	public TrailDTO createNewTrail(Long userId,TrailDTO trailDTO) throws IOException {
@@ -49,7 +55,7 @@ public class TrailService {
 		trailEntity.setTrailName(trailDTO.getTrailName());
 		trailEntity.setTrailDescription(trailDTO.getTrailDescription());
 		trailEntity.setTrailStatus(StatusOfLife.BUILDING);
-		trailEntity.setTrailPrice(trailDTO.getTrailPrice());
+
 		trailEntity.setTrailCreatedDate(LocalDate.now());
 		trailEntity.setTrailUpdatedDate(null);
 		
@@ -63,22 +69,30 @@ public class TrailService {
 		UserEntity userEntity = usersRepository.findById(userId)
 				.orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userId));;
 		
+		
 		trailEntity.setUser(userEntity);
 		userEntity.setXp(userEntity.getXp()+50);
+		
 		
 	
         for (ActivityDTO dto : trailDTO.getActivities()) {
             ActivityEntity activityEntity = new ActivityEntity();
             activityEntity.setActivityName(dto.getActivityName());
             activityEntity.setActivityDescription(dto.getActivityDescription());
-            activityEntity.setActivityPrice(dto.getActivityPrice());
+           
             activityEntity.setActivityDifficulty(dto.getActivityDifficulty());
             activityEntity.setActivityStatus(StatusOfLife.DESABLED);
             activityEntity.setActivityCreatedAt(LocalDate.now());
             activityEntity.setActivityUpdatedAt(null);
             activityEntity.setTrail(trailEntity); 
+            RewardPackageEntity rewardPackageEntity = rewardRepository.findByRewardActivityDifficulty(activityEntity.getActivityDifficulty())
+            		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
+            
+            activityEntity.setRewardPackage(rewardPackageEntity);
             trailEntity.getActivities().add(activityEntity);
-            userEntity.setXp(userEntity.getXp()+50);
+            System.out.println("xp do usuario - PROFESSOR - ANTES: " + userEntity.getXp());
+            userEntity.setXp(userEntity.getXp()+rewardPackageEntity.getRewardPackageXp());
+            System.out.println("xp do usuario - PROFESSOR - DEPOIS DA RECOMPENSA: "+userEntity.getXp());
         }
 			
 		
@@ -116,6 +130,9 @@ public class TrailService {
 		}
 		UserEntity userEntity = usersRepository.findById(userId)
 				.orElseThrow(() -> new EntityNotFoundException("Usuário não encontrado: " + userId));
+		if(trailEntity.getTrailStatus().ordinal()==0) {
+			throw new UnauthorizedAcessUserException("Sua Trilha é pública agora, contate-nos");
+		}
 		
 		// Validar o nome da trilha
 	    if (trailDTO.getTrailName() != null && !trailDTO.getTrailName().isEmpty()) {
@@ -131,9 +148,7 @@ public class TrailService {
 		if(trailDTO.getTrailDescription() !=null) {
 			trailEntity.setTrailDescription(trailDTO.getTrailDescription());
 		}
-		if(trailDTO.getTrailPrice() !=null) {
-			trailEntity.setTrailPrice(trailDTO.getTrailPrice());
-		}
+		
 		if (trailDTO.getTrailPassword() != null && !trailDTO.getTrailPassword().isEmpty()) {
 		    BCryptPasswordEncoder encoder = new BCryptPasswordEncoder();
 		    
@@ -180,11 +195,13 @@ public class TrailService {
 		            if (activityDTO.getActivityDescription() != null) {
 		                activityEntity.setActivityDescription(activityDTO.getActivityDescription());
 		            }
-		            if (activityDTO.getActivityPrice() != null) {
-		                activityEntity.setActivityPrice(activityDTO.getActivityPrice());
-		            }
+		          
 		            if (activityDTO.getActivityDifficulty() != null) {
 		                activityEntity.setActivityDifficulty(activityDTO.getActivityDifficulty());
+		                RewardPackageEntity rewardPackageEntity = rewardRepository.findByRewardActivityDifficulty(activityEntity.getActivityDifficulty())
+		                		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
+		                
+		                activityEntity.setRewardPackage(rewardPackageEntity);
 		            }
 		            if (activityDTO.getActivityStatus() != null) {
 		                activityEntity.setActivityStatus(activityDTO.getActivityStatus());
@@ -195,12 +212,16 @@ public class TrailService {
 
 		            activitiesPresentInBase.remove(activityDTO.getActivityId());
 		        } else {
-		        	userEntity.setXp(userEntity.getXp()+25);
+		        	
 		            activityEntity = new ActivityEntity();
 		            activityEntity.setActivityName(activityDTO.getActivityName());
 		            activityEntity.setActivityDescription(activityDTO.getActivityDescription());
-		            activityEntity.setActivityPrice(activityDTO.getActivityPrice());
 		            activityEntity.setActivityDifficulty(activityDTO.getActivityDifficulty());
+		            RewardPackageEntity rewardPackageEntity = rewardRepository.findByRewardActivityDifficulty(activityEntity.getActivityDifficulty())
+		            		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
+		            
+		            activityEntity.setRewardPackage(rewardPackageEntity);
+		            userEntity.setXp(userEntity.getXp()+25);
 		            activityEntity.setActivityStatus(StatusOfLife.DESABLED);
 		            activityEntity.setActivityCreatedAt(LocalDate.now());
 		            activityEntity.setTrail(trailEntity);
@@ -229,7 +250,7 @@ public class TrailService {
 	
 	
 	
-	public void deleteActivity(Long userId, Long trailId, Integer activityId) {
+	public void deleteActivity(Long userId, Long trailId, Long activityId) {
 	        TrailEntity trail = trailRepository.findById(trailId)
 	            .orElseThrow(() -> new EntityNotFoundException("Trilha não encontrada"));
 	        if (!trail.getUser().getUserId().equals(userId)) {

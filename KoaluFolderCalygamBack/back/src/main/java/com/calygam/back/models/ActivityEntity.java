@@ -33,8 +33,7 @@ public class ActivityEntity {
 	@Column(name="activity_description",columnDefinition="TEXT")
 	private String activityDescription;
 	
-	@Column(name="activity_price")
-	private Integer activityPrice;
+
 	
 	@Column(name="activity_difficulty")
 	private DifficultyEnum activityDifficulty;
@@ -54,25 +53,35 @@ public class ActivityEntity {
 	
 	@OneToMany(mappedBy="activity",cascade=CascadeType.ALL,orphanRemoval=true)
 	private List<ActivityProgressEntity> progress = new ArrayList<>();
+	
+	@ManyToOne
+	@JoinColumn(name="reward_package_id")
+	private RewardPackageEntity rewardPackage;
 
 	public ActivityEntity() {
 		super();
 	}
 
-	public ActivityEntity(Long activityId, String activityName, String activityDescription, Integer activityPrice,
+
+
+	public ActivityEntity(Long activityId, String activityName, String activityDescription,
 			DifficultyEnum activityDifficulty, StatusOfLife activityStatus, LocalDate activityCreatedAt,
-			LocalDate activityUpdatedAt, TrailEntity trail) {
+			LocalDate activityUpdatedAt, TrailEntity trail, List<ActivityProgressEntity> progress,
+			RewardPackageEntity rewardPackage) {
 		super();
 		this.activityId = activityId;
 		this.activityName = activityName;
 		this.activityDescription = activityDescription;
-		this.activityPrice = activityPrice;
 		this.activityDifficulty = activityDifficulty;
 		this.activityStatus = activityStatus;
 		this.activityCreatedAt = activityCreatedAt;
 		this.activityUpdatedAt = activityUpdatedAt;
 		this.trail = trail;
+		this.progress = progress;
+		this.rewardPackage = rewardPackage;
 	}
+
+
 
 	public Long getActivityId() {
 		return activityId;
@@ -98,13 +107,7 @@ public class ActivityEntity {
 		this.activityDescription = activityDescription;
 	}
 
-	public Integer getActivityPrice() {
-		return activityPrice;
-	}
 
-	public void setActivityPrice(Integer activityPrice) {
-		this.activityPrice = activityPrice;
-	}
 
 	public DifficultyEnum getActivityDifficulty() {
 		return activityDifficulty;
@@ -152,6 +155,18 @@ public class ActivityEntity {
 
 	public void setProgress(List<ActivityProgressEntity> progress) {
 		this.progress = progress;
+	}
+
+
+
+	public RewardPackageEntity getRewardPackage() {
+		return rewardPackage;
+	}
+
+
+
+	public void setRewardPackage(RewardPackageEntity rewardPackage) {
+		this.rewardPackage = rewardPackage;
 	}
 	
 	

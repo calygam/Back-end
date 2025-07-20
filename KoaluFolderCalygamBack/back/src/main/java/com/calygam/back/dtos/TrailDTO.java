@@ -16,7 +16,7 @@ public class TrailDTO {
 	private String trailName;
 	private String trailDescription;
 	private StatusOfLife trailStatus;
-	private Long trailPrice;
+
 	private MultipartFile trailFileImage;
 	private String trailImage;
 	private LocalDate trailCreatedDate;
@@ -44,14 +44,14 @@ public class TrailDTO {
 
 	
 	
-	public TrailDTO(Long trailId, String trailName, String trailDescription, Long trailPrice, MultipartFile trailFileImage,
+	public TrailDTO(Long trailId, String trailName, String trailDescription,  MultipartFile trailFileImage,
 			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, Long trailVacancy,
 			Long trailVacancies, Long user) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
 		this.trailDescription = trailDescription;
-		this.trailPrice = trailPrice;
+		
 		this.trailFileImage = trailFileImage;
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
@@ -66,14 +66,14 @@ public class TrailDTO {
 	
 
 
-	public TrailDTO(Long trailId, String trailName, String trailDescription, Long trailPrice,
+	public TrailDTO(Long trailId, String trailName, String trailDescription,
 			MultipartFile trailFileImage, String trailImage, LocalDate trailCreatedDate, LocalDate trailUpdatedDate,
 			String trailPassword, Long trailVacancy, Long trailVacancies, Long user, List<ActivityDTO> activities) {
 		super();
 		this.trailId = trailId;
 		this.trailName = trailName;
 		this.trailDescription = trailDescription;
-		this.trailPrice = trailPrice;
+	
 		this.trailFileImage = trailFileImage;
 		this.trailImage = trailImage;
 		this.trailCreatedDate = trailCreatedDate;
@@ -86,7 +86,7 @@ public class TrailDTO {
 	}
 
 
-	public TrailDTO(Long trailId, String trailName,String trailImage, String trailDescription, Long trailPrice,
+	public TrailDTO(Long trailId, String trailName,String trailImage, String trailDescription,
 			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, Long trailVacancy,
 			Long trailVacancies, Long user) {
 		super();
@@ -94,7 +94,7 @@ public class TrailDTO {
 		this.trailName = trailName;
 		this.trailImage = trailImage;
 		this.trailDescription = trailDescription;
-		this.trailPrice = trailPrice;
+	
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 	
@@ -114,7 +114,7 @@ public class TrailDTO {
 		trailImage = entity.getArchiveName();
 		trailDescription = entity.getTrailDescription();
 		trailStatus = entity.getTrailStatus();
-		trailPrice = entity.getTrailPrice();
+	
 		trailCreatedDate = entity.getTrailCreatedDate();
 		trailUpdatedDate = entity.getTrailUpdatedDate();
 		
@@ -156,13 +156,7 @@ public class TrailDTO {
 		this.trailDescription = trailDescription;
 	}
 
-	public Long getTrailPrice() {
-		return trailPrice;
-	}
 
-	public void setTrailPrice(Long trailPrice) {
-		this.trailPrice = trailPrice;
-	}
 
 	public LocalDate getTrailCreatedDate() {
 		return trailCreatedDate;

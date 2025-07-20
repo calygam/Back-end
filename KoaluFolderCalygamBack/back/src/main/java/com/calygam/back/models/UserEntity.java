@@ -1,6 +1,5 @@
 package com.calygam.back.models;
 
-import java.math.BigInteger;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -62,6 +61,8 @@ public class UserEntity implements UserDetails {
 	
 	@Column(name="user_money")
 	private Long userMoney;
+	@Column(name="user_food")
+	private Long userFood;
 	@Column(name="user_xp")
 	private Long xp;
 	
@@ -83,8 +84,14 @@ public class UserEntity implements UserDetails {
 	@OneToMany(mappedBy="user",cascade = CascadeType.ALL)
 	private List<ActivityProgressEntity> progress = new ArrayList<ActivityProgressEntity>();
 
+	@OneToMany(mappedBy="apprentice",cascade = CascadeType.ALL)
+	private List<ApprenticeInventoryEntity> items = new ArrayList<ApprenticeInventoryEntity>();
 
-
+	@OneToMany(mappedBy="apprentice",cascade = CascadeType.ALL,orphanRemoval = true)
+	private List<ControlApprenticePetEntity> pets = new ArrayList<ControlApprenticePetEntity>();
+	
+	@OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<DailyFlagsEntity> flags = new ArrayList<DailyFlagsEntity>();
 
 
 
@@ -114,8 +121,8 @@ public class UserEntity implements UserDetails {
 	public UserEntity(Long userId, String userProviderId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
 			String userPassword, String userImagePerfil, @CPF(message = "calygam<- CPF inválido") String userCpf,
-			Long userMoney, Long xp, UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus,
-			List<TrailEntity> trails, List<ActivityProgressEntity> progress) {
+			Long userMoney,Long userFood, Long xp, UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus,
+			List<TrailEntity> trails, List<ActivityProgressEntity> progress,List<ControlApprenticePetEntity> pets,List<ApprenticeInventoryEntity> items,List<DailyFlagsEntity> flags) {
 		super();
 		this.userId = userId;
 		this.userProviderId = userProviderId;
@@ -125,12 +132,15 @@ public class UserEntity implements UserDetails {
 		this.userImagePerfil = userImagePerfil;
 		this.userCpf = userCpf;
 		this.userMoney = userMoney;
+		this.userFood = userFood;
 		this.xp = xp;
 		this.userRank = userRank;
 		this.userRole = userRole;
 		this.userStatus = userStatus;
 		this.trails = trails;
-		this.progress = progress;
+		this.pets = pets;
+		this.items = items;
+		this.flags = flags;
 	}
 
 
@@ -246,6 +256,28 @@ public class UserEntity implements UserDetails {
 	public void setTrails(List<TrailEntity> trails) {
 		this.trails = trails;
 	}
+	
+	
+	public List<ControlApprenticePetEntity> getPets() {
+		return pets;
+	}
+
+	public void setPets(List<ControlApprenticePetEntity> pets) {
+		this.pets = pets;
+	}
+	
+	
+	public List<ApprenticeInventoryEntity> getItems() {
+		return items;
+	}
+
+
+
+	public void setItems(List<ApprenticeInventoryEntity> items) {
+		this.items = items;
+	}
+
+
 	@Override
 	public Collection<? extends GrantedAuthority> getAuthorities() {
 		if(this.userRole == UserRoleEnum.ADMIN) {
@@ -310,22 +342,15 @@ public class UserEntity implements UserDetails {
 	public UserStatus getUserStatus() {
 		return userStatus;
 	}
+	
 
+	public Long getUserFood() {
+		return userFood;
+	}
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+	public void setUserFood(Long userFood) {
+		this.userFood = userFood;
+	}
 
 
 	public void setUserStatus(UserStatus userStatus) {
@@ -333,44 +358,24 @@ public class UserEntity implements UserDetails {
 	}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public List<ActivityProgressEntity> getProgress() {
 		return progress;
 	}
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 	public void setProgress(List<ActivityProgressEntity> progress) {
 		this.progress = progress;
 	}
+
+	public List<DailyFlagsEntity> getFlags() {
+		return flags;
+	}
+
+	public void setFlags(List<DailyFlagsEntity> flags) {
+		this.flags = flags;
+	}
+	
+	
 
 	
 

@@ -10,9 +10,7 @@ public enum UserRankEnum {
 		SILVERI(1500,"SILVER-I"),
 		SILVERII(2000,"SILVER-II"),
 		SILVERIII(2500,"SILVER-III"),
-		IRONI(3000,"IRON-I"),
-		IRONII(3500,"IRON-II"),
-		IRONIII(4000,"IRON-III"),	
+		
 		
 		GOLDI(4500,"GOLD-I"),
 		GOLDII(5000,"GOLD-II"),
@@ -56,6 +54,15 @@ public enum UserRankEnum {
         
         return bestRank;
     }
+	
+	public static Integer getXpByRankName(String rankName) {
+	    for (UserRankEnum rank : UserRankEnum.values()) {
+	        if (rank.getNameRank().equalsIgnoreCase(rankName)) {
+	            return rank.getPoints();
+	        }
+	    }
+	    return null;
+	}
 
 	public static UserRankEnum getRankForXp(Long xp) {
         UserRankEnum bestRank = BRONZEI;
@@ -82,6 +89,14 @@ public enum UserRankEnum {
         
         return bestRank;
     }
+	
+	 public static UserRankEnum fromCode(int code) {
+	        UserRankEnum[] values = values();
+	        if (code < 0 || code >= values.length) {
+	            throw new IllegalArgumentException("Código inválido para UserRankEnum: " + code);
+	        }
+	        return values[code];
+	    }
 	
 	
 	

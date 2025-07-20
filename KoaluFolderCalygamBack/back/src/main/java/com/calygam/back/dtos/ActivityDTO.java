@@ -16,7 +16,7 @@ public class ActivityDTO {
 	private String activityDescription;
 	
 
-	private Integer activityPrice;
+	
 	
 
 	private DifficultyEnum activityDifficulty;
@@ -38,14 +38,14 @@ public class ActivityDTO {
 		super();
 	}
 
-	public ActivityDTO(Long activityId, String activityName, String activityDescription, Integer activityPrice,
+	public ActivityDTO(Long activityId, String activityName, String activityDescription,
 			DifficultyEnum activityDifficulty, StatusOfLife activityStatus, LocalDate activityCreatedAt,
 			LocalDate activityUpdatedAt) {
 		super();
 		this.activityId = activityId;
 		this.activityName = activityName;
 		this.activityDescription = activityDescription;
-		this.activityPrice = activityPrice;
+		
 		this.activityDifficulty = activityDifficulty;
 		this.activityStatus = activityStatus;
 		this.activityCreatedAt = activityCreatedAt;
@@ -57,7 +57,7 @@ public class ActivityDTO {
 		activityId = entity.getActivityId();
 		activityName = entity.getActivityName();
 		activityDescription = entity.getActivityDescription();
-		activityPrice = entity.getActivityPrice();
+	
 		activityDifficulty = entity.getActivityDifficulty();
 		activityStatus = entity.getActivityStatus();
 		activityCreatedAt = entity.getActivityCreatedAt();
@@ -90,13 +90,7 @@ public class ActivityDTO {
 		this.activityDescription = activityDescription;
 	}
 
-	public Integer getActivityPrice() {
-		return activityPrice;
-	}
 
-	public void setActivityPrice(Integer activityPrice) {
-		this.activityPrice = activityPrice;
-	}
 
 	public DifficultyEnum getActivityDifficulty() {
 		return activityDifficulty;

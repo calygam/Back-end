@@ -29,9 +29,20 @@ public class MakeUploadAndDownloadArchive {
 	// caio<- vamos garantir que a pasta exista em qualquer ambiente (Azure, local, etc.)
 	private Path initUploadDir() {
 		try {
-			Path path = Paths.get("uploads").toAbsolutePath().normalize(); // caio<- sempre na raiz do projeto
-			Files.createDirectories(path); // caio<- cria a pasta se não existir
+			Path path;
+
+			// caio<- se estivermos no Azure, usamos o diretório persistente deles (/home/site/uploads)
+			// caio<- isso evita que os uploads sumam a cada novo push
+			if (System.getenv("HOME") != null && System.getenv("HOME").contains("/home")) {
+				path = Paths.get("/home/site/uploads").toAbsolutePath().normalize();
+			} else {
+				// caio<- se for local, usamos a pasta padrão na raiz do projeto
+				path = Paths.get("uploads").toAbsolutePath().normalize();
+			}
+
+			Files.createDirectories(path); // caio<- cria a pasta se não existir, em qualquer ambiente
 			return path;
+
 		} catch (IOException e) {
 			throw new RuntimeException("caio<- erro ao criar diretório de uploads", e);
 		}
@@ -98,21 +109,43 @@ public class MakeUploadAndDownloadArchive {
 	        JpaRepository<T, Long> repository) {
 
 	    try {
+	        // caio<- buscando a entidade no banco pelo nome salvo (UUID)
 	        T archiveEntity = repository.findAll().stream()
 	                .filter(a -> archiveName.equals(a.getArchiveName()))
 	                .findFirst()
 	                .orElseThrow(() -> new IOException("Arquivo não encontrado: " + archiveName));
 
+	        // caio<- recuperando o arquivo como recurso
 	        Resource resource = collectFileResource(archiveName);
+
+	        // caio<- pegando o tipo MIME do arquivo
 	        String archiveType = archiveEntity.getArchiveType();
 
-	        String disposition = archiveType != null && archiveType.startsWith("image/") || "application/pdf".equals(archiveType)
+	        // caio<- definindo o tipo de download: inline para imagens/pdf, attachment para outros
+	        String dispositionType = (archiveType != null && (archiveType.startsWith("image/")
+	                || "application/pdf".equals(archiveType)))
 	                ? "inline"
 	                : "attachment";
 
+	        // caio<- pegando o nome original salvo no banco (para mostrar no download)
+	        String originalName = archiveEntity.getOriginalName();
+
+	        // caio<- fallback para o nome salvo se o original estiver vazio (segurança)
+	        String downloadName = (originalName == null || originalName.isBlank())
+	                ? archiveName
+	                : originalName;
+
+	        // caio<- nome do arquivo codificado corretamente para suportar acentos e espaços
+	        String encodedName = java.net.URLEncoder.encode(downloadName, java.nio.charset.StandardCharsets.UTF_8)
+	                .replaceAll("\\+", "%20");
+
+	        // caio<- retornando a resposta com o nome original no header
 	        return ResponseEntity.ok()
-	                .header(HttpHeaders.CONTENT_DISPOSITION, disposition + "; filename=\"" + archiveName + "\"")
-	                .contentType(MediaType.parseMediaType(archiveType != null ? archiveType : "application/octet-stream"))
+	                .header(HttpHeaders.CONTENT_DISPOSITION,
+	                        String.format("%s; filename=\"%s\"; filename*=UTF-8''%s",
+	                                dispositionType, downloadName, encodedName))
+	                .contentType(MediaType.parseMediaType(
+	                        archiveType != null ? archiveType : "application/octet-stream"))
 	                .body(resource);
 
 	    } catch (IOException e) {

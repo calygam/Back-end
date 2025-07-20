@@ -63,6 +63,7 @@ public class UsersServices {
 		userEntity.setUserStatus(UserStatus.ACTIVE);
 		Long xp = 0L;
 		userEntity.setXp(xp);
+		userEntity.setUserFood(0L);
 		userEntity.setUserRole(UserRoleEnum.ALUNO);
 		String encrypitedPassword = new BCryptPasswordEncoder().encode(registerDTO.getUserPassword());
 		userEntity.setUserPassword(encrypitedPassword);
@@ -107,6 +108,7 @@ public class UsersServices {
 			user.setXp(xp);
 			user.setUserRole(UserRoleEnum.ALUNO);
 			user.setUserMoney(0L);
+			user.setUserFood(0L);
 			user.setUserEmail(email);
 			user.setUserStatus(UserStatus.ACTIVE);
 			user.setuserProviderId(id);

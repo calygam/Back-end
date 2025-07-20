@@ -1,10 +1,13 @@
 package com.calygam.back.models;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.utils.GenericFileManagement;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
@@ -12,11 +15,12 @@ import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name="tb_trail_x_activity_progress")
-public class ActivityProgressEntity implements GenericFileManagement {
+public class ActivityProgressEntity  {
 	
 	@Id
 	@GeneratedValue(strategy=GenerationType.IDENTITY)
@@ -48,17 +52,10 @@ public class ActivityProgressEntity implements GenericFileManagement {
 	@Column(name="unlocked_activities")
 	private Long unlockedActivities;
 	
-	@Column(name="submit_archive_name")
-	private String archiveName;
+	@OneToMany(mappedBy="progress",cascade = CascadeType.ALL, orphanRemoval = true )
+	private List<SubmissionEntity> submissions = new ArrayList<>();
 	
-	@Column(name="submit_original_name")
-	private String originalName;
-	
-	@Column(name="submit_archive_path")
-	private String archivePath;
-	
-	@Column(name="submit_archive_type")
-	private String archiveType;
+
 	
 	
 	public ActivityProgressEntity() {
@@ -66,9 +63,11 @@ public class ActivityProgressEntity implements GenericFileManagement {
 	}
 
 
+	
+
 	public ActivityProgressEntity(Long progressId, UserEntity user, TrailEntity trail, ActivityEntity activity,
 			StatusOfLife trailStatus, StatusOfLife activityStatus, LocalDate createdAt, LocalDate updatedAt,
-			Long unlockedActivities) {
+			Long unlockedActivities, List<SubmissionEntity> submissions) {
 		super();
 		this.progressId = progressId;
 		this.user = user;
@@ -79,7 +78,10 @@ public class ActivityProgressEntity implements GenericFileManagement {
 		this.createdAt = createdAt;
 		this.updatedAt = updatedAt;
 		this.unlockedActivities = unlockedActivities;
+		this.submissions = submissions;
 	}
+
+
 
 
 	public Long getProgressId() {
@@ -162,52 +164,20 @@ public class ActivityProgressEntity implements GenericFileManagement {
 		this.unlockedActivities = unlockedActivities;
 	}
 
-	public String getArchiveName() {
-		return archiveName;
-	}
-
-
-	public void setArchiveName(String archiveName) {
-		this.archiveName = archiveName;
-	}
 
 
 
-	public String getOriginalName() {
-		return originalName;
-	}
-
-
-	public void setOriginalName(String originalName) {
-		this.originalName = originalName;
-	}
-
-
-
-	public String getArchivePath() {
-		return archivePath;
-	}
-
-
-	public void setArchivePath(String archivePath) {
-		this.archivePath = archivePath;
-	}
-
-
-
-	public String getArchiveType() {
-		return archiveType;
+	public List<SubmissionEntity> getSubmissions() {
+		return submissions;
 	}
 
 
 
 
-
-
-
-	public void setArchiveType(String archiveType) {
-		this.archiveType = archiveType;
+	public void setSubmissions(List<SubmissionEntity> submissions) {
+		this.submissions = submissions;
 	}
+
 	
 	
 	

@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
+import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.projections.ActivityProgressProjection;
 import com.calygam.back.projections.ProgressAssignProjection;
@@ -16,7 +17,7 @@ import com.calygam.back.projections.ProgressAssignProjection;
 public interface ProgressRepository extends JpaRepository<ActivityProgressEntity, Long> {
 	@Query("SELECT p.progressId AS progressId, p.user.id AS userId, p.trail.id AS trailId, p.activity.id AS activityId, " +
 		       "p.trailStatus AS trailStatus, p.activityStatus AS activityStatus, " +
-		       "p.createdAt AS createdAt, p.updatedAt AS updatedAt, p.unlockedActivities AS unlockedActivities, p.archiveName AS archiveName " +
+		       "p.createdAt AS createdAt, p.updatedAt AS updatedAt, p.unlockedActivities AS unlockedActivities " +
 		       "FROM ActivityProgressEntity p " +
 		       "WHERE p.user.id = :userId AND p.trail.id = :trailId")
 		List<ProgressAssignProjection> findProgressByUserIdAndTrailId(Long userId, Long trailId);
@@ -37,7 +38,7 @@ public interface ProgressRepository extends JpaRepository<ActivityProgressEntity
 	Long countTotalActivitiesCompleted(Long userId, Long trailId);
 	
 	 @Query(value = """
-		        SELECT 
+		      SELECT 
 		            p.progress_id AS progressId,
 		            p.activity_id AS activityId,
 		            p.trail_id AS trailId,
@@ -45,9 +46,12 @@ public interface ProgressRepository extends JpaRepository<ActivityProgressEntity
 		            atv.activity_name AS activityName,
 		              atv.activity_description AS activityDescription,
 		            atv.activity_difficulty AS activityDifficulty,
-		            atv.activity_price AS activityPrice
+                    rwd.reward_package_money AS rewardPackageMoney,
+                    rwd.reward_package_xp AS rewardPackageXp,
+                    rwd.reward_package_food AS rewardPackageFood
 		        FROM tb_trail_x_activity_progress p
 		        INNER JOIN tb_activities atv ON p.activity_id = atv.activity_id
+                INNER JOIN tb_reward_package rwd ON rwd.reward_package_id = atv.reward_package_id
 		        WHERE p.user_id = :userId
 		          AND p.trail_id = :trailId
 		          AND p.activity_status = 0
@@ -59,14 +63,77 @@ public interface ProgressRepository extends JpaRepository<ActivityProgressEntity
 		        @Param("trailId") Long trailId
 		    );
 	 
-	 @Query("""
-	 		SELECT prog FROM ActivityProgressEntity prog WHERE prog.user.userId = :userId AND prog.trail.trailId = :trailId AND prog.activity.activityId = :activityId
-	 		""")
-	 Optional<ActivityProgressEntity> findByUserTrailAndActivity(
-			    @Param("userId") Long userId,
+	 
+	 @Query(value = """
+		        SELECT 
+		            p.progress_id AS progressId,
+		            p.activity_id AS activityId,
+		            p.trail_id AS trailId,
+		            p.activity_status AS activityStatus,
+		            atv.activity_name AS activityName,
+		              atv.activity_description AS activityDescription,
+		            atv.activity_difficulty AS activityDifficulty 
+		       
+		        FROM tb_trail_x_activity_progress p
+		        INNER JOIN tb_activities atv ON p.activity_id = atv.activity_id
+		        WHERE p.user_id = :userId
+		          AND p.trail_id = :trailId
+		          AND p.activity_status = 2
+		        ORDER BY p.activity_id DESC
+		        LIMIT 1
+		        """, nativeQuery = true)
+		    Optional<ActivityProgressProjection> findMostRecentActivityCompletedWithProgress(
+		        @Param("userId") Long userId,
+		        @Param("trailId") Long trailId
+		    );
+
+	 
+	 @Query(value = """
+			    SELECT MIN(activity_id) FROM tb_trail_x_activity_progress prog 
+			    WHERE prog.user_id = :userId 
+			    AND prog.trail_id = :trailId 
+			    AND prog.activity_status = :activityStatus
+			    """, nativeQuery = true)
+			Long findMinActivityIdPerStatus(
+			    @Param("userId") Long userId, 
 			    @Param("trailId") Long trailId,
-			    @Param("activityId") Long activityId
+			    @Param("activityStatus") Long activityStatus);	 
+	 
+	 
+	 @Query(value = """
+			    SELECT MAX(activity_id) FROM tb_trail_x_activity_progress prog 
+			    WHERE prog.user_id = :userId 
+			    AND prog.trail_id = :trailId 
+			    AND prog.activity_status = :activityStatus
+			    """, nativeQuery = true)
+			Long findMinActivityIdPerMAXStatus(
+			    @Param("userId") Long userId, 
+			    @Param("trailId") Long trailId,
+			    @Param("activityStatus") Long activityStatus);
+			 
+	 @Query(value = """
+			    SELECT * FROM tb_trail_x_activity_progress prog 
+			    WHERE prog.user_id = :userId 
+			    AND prog.trail_id = :trailId 
+			    AND prog.activity_id = :activityId
+			    """, nativeQuery = true)
+			Optional<ActivityProgressEntity> findByUserTrailAndActivity(
+			    @Param("userId") Long userId, 
+			    @Param("trailId") Long trailId, 
+			    @Param("activityId") Long activityId);
+	 
+	 
+	 @Query(value = """
+			    SELECT * FROM tb_trail_x_activity_progress
+			    WHERE user_id = :userId AND trail_id = :trailId AND activity_status = 1
+			    LIMIT 1
+			    """, nativeQuery = true)
+			Optional<ActivityProgressEntity> findByUserTrailDisabled(
+			    @Param("userId") Long userId,
+			    @Param("trailId") Long trailId
 			);
+	 
+
 
 	
 	

@@ -9,7 +9,7 @@ public interface ActivityProjection {
 	Long getActivityId();
 	String getActivityName();
 	String getActivityDescription();
-	Integer getActivityPrice();
+	
 	DifficultyEnum getActivityDifficulty();
 	StatusOfLife getActivityStatus();
 	LocalDate getActivityCreatedAt();

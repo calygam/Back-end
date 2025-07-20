@@ -18,23 +18,39 @@ import org.springframework.stereotype.Service;
 import com.calygam.back.dtos.ActivityProgressDTO;
 import com.calygam.back.dtos.ActivityProgressResponseDTO;
 import com.calygam.back.dtos.ProgressSubmitActivityDTO;
+import com.calygam.back.enums.ItemCatalogInventoryEnum;
 import com.calygam.back.enums.StatusOfLife;
+import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
+import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.exceptions.UserAlreadExistsException;
 import com.calygam.back.exceptions.UserNotIdentifiedException;
 import com.calygam.back.mappers.ActivityProgressMapper;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.ActivityProgressEntity;
+import com.calygam.back.models.ApprenticeInventoryEntity;
+import com.calygam.back.models.DailyFlagsEntity;
+import com.calygam.back.models.PetEntity;
+import com.calygam.back.models.PetOutfitEntity;
+import com.calygam.back.models.RewardPackageEntity;
+import com.calygam.back.models.SubmissionEntity;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.projections.ActivityProgressProjection;
 import com.calygam.back.projections.ProgressAssignProjection;
 import com.calygam.back.repositories.ActivityRepository;
+import com.calygam.back.repositories.ApprenticeInventoryRepository;
+import com.calygam.back.repositories.DailyFlagsRepository;
+import com.calygam.back.repositories.PetOutfitRepository;
+import com.calygam.back.repositories.PetRepository;
 import com.calygam.back.repositories.ProgressRepository;
+import com.calygam.back.repositories.RewardRepository;
+import com.calygam.back.repositories.SubmissionsRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.utils.GenerateProgress;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
+import com.calygam.back.utils.RewardUtils;
 
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
@@ -57,6 +73,22 @@ public class ProgressActivityService {
 	@Autowired
 	private ProgressRepository progressRepository;
 	
+	
+	@Autowired
+	private RewardRepository rewardRepository;
+	
+	@Autowired
+	private PetRepository petRepository;
+	
+	@Autowired
+	private PetOutfitRepository petOutfitRepository;
+	
+	@Autowired
+	private ApprenticeInventoryRepository apprenticeInventoryRepository;
+	
+	@Autowired
+	private SubmissionsRepository submissionsRepository;
+	
 	@Autowired
 	private ActivityProgressMapper activityProgressMapper;
 	
@@ -64,7 +96,18 @@ public class ProgressActivityService {
 	private PasswordEncoder passwordEncoder;
 	
 	@Autowired
+	private DailyFlagsService dailyFlagsService;
+	
+	@Autowired
+	private DailyFlagsRepository dailyFlagsRepository;
+	
+	
+	
+	@Autowired
 	private MakeUploadAndDownloadArchive makeUploadAndDownloadArchive;
+	
+	@Autowired
+	private RewardUtils rewardUtils;
 	
 	@Transactional
 	public List<ActivityProgressResponseDTO> progressAssignStudent(String trailPassword,Long userId, Long trailId)  {
@@ -85,7 +128,7 @@ public class ProgressActivityService {
 	    	 Boolean hasProgress = progressRepository
 	    	            .existsByUserIdAndTrailId(userId, trailId);
 	    	if(!hasProgress) {
-	    	   
+	    		trailEntity.setTrailVacancy(trailEntity.getTrailVacancy()+1);
 	    		  List<ActivityProgressEntity> progressList = trailEntity.getActivities().stream()
 	    			        .map(activity -> {
 	    			            boolean isFirst = index.getAndIncrement() == 0;
@@ -133,7 +176,12 @@ public class ProgressActivityService {
     }
 	
 	 public Optional<ActivityProgressProjection> getCurrentActivityEnable(Long userId, Long trailId) {
-	        return progressRepository.findMostRecentActivityWithProgress(userId, trailId);
+		 if(progressRepository.findMostRecentActivityWithProgress(userId, trailId).isEmpty()) {
+			 return progressRepository.findMostRecentActivityCompletedWithProgress(userId, trailId);
+		 }else {
+			 return progressRepository.findMostRecentActivityWithProgress(userId, trailId);
+		 }
+	      
 	    }
 	 
 	 
@@ -141,39 +189,138 @@ public class ProgressActivityService {
 	 
 	 
 	 //Caio<- vamos enviar a atividade do aluno
-	 public ResponseEntity<String> submitActivityForTeacher(Long userId, Long trailId,Long activityId,ProgressSubmitActivityDTO dto) throws IOException{
-		 UserEntity userEntity = usersRepository.findEntityByUserId(userId)
-				  .orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
-		 
-		 if(userEntity.getUserRole().ordinal()<3) {
-				    throw new UserAlreadExistsException("você é um professor!");
-		 	}
-			      
-		 ActivityEntity activityEntity = activityRepository.findActivityByTrailIdAndActivityId(activityId, trailId)
-				 .orElseThrow(()-> new EntityNotFoundException("Atividade não identificada!"));
-		 System.out.println("""
-		 		////////////////////////////////////////
-		 			
-		 		//////////////////////////////////////// ActivityId + = """+ activityEntity.getActivityId());
-    	 ActivityProgressEntity progressEntity = progressRepository.findByUserTrailAndActivity(userId, trailId,activityEntity.getActivityId())
- 	          .orElseThrow(()-> new EntityNotFoundException("Progresso não identificado"));
-		 System.out.println("""
-			 		////////////////////////////////////////
-			 			
-			 		//////////////////////////////////////// ActivityId + = """+ progressEntity.getActivity().getActivityId());
-    	 if(progressEntity.getActivityStatus().ordinal()==0 && progressEntity.getUser().getUserRole().ordinal()==3) {
-    		 progressEntity.setActivityStatus(StatusOfLife.COMPLETE);
-    		 progressEntity.setUpdatedAt(LocalDate.now());
-    		 makeUploadAndDownloadArchive.saveArchive(dto.getActivityFile(),progressEntity,progressRepository);
-    	 }else if(progressEntity.getActivityStatus().ordinal()==2){
-    		 throw new UserAlreadExistsException("Atividade já entregue!");
-    	 }else {
-    		 throw new EntityNotFoundException("Usuario não é um aluno " +" atividade status "+progressEntity.getActivity().getActivityStatus().ordinal() +" Ordinal do usuário =  "+ progressEntity.getUser().getUserRole().ordinal());
-    	 }
-    	 return ResponseEntity.ok("Atividade Enviada com sucesso!");
-		 
-		 
-		
+	 @Transactional
+	 public ResponseEntity<String> submitActivityForTeacher(Long userId, Long trailId, Long activityId, ProgressSubmitActivityDTO dto) throws IOException {
+	     UserEntity userEntity = usersRepository.findEntityByUserId(userId)
+	             .orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
+
+	     if (userEntity.getUserRole() == UserRoleEnum.INSTRUTOR) {
+	         throw new UserAlreadExistsException("você é um professor!");
+	     }
+	     
+	     DailyFlagsEntity tokenEntity = dailyFlagsService.collectOrGenerateFlags(userEntity);
+	     if (tokenEntity.getUserFlags() <= 0) {
+	         throw new ExcededMaxDelimiter("Limite diário de bandeiras gastas. Tente novamente amanhã.");
+	     }
+
+
+	     ActivityEntity activityEntity = activityRepository.findActivityByTrailIdAndActivityId(activityId, trailId)
+	             .orElseThrow(() -> new EntityNotFoundException("Atividade não identificada!"));
+
+	     Long progressMinePerStatus= progressRepository.findMinActivityIdPerMAXStatus(userId, trailId,(long) 0) ;
+	     
+ 	     ActivityProgressEntity progressEntityCompleted = progressRepository.findByUserTrailAndActivity(userId, trailId, activityId)
+	             .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado linha"));
+ 	     
+	      if(progressEntityCompleted.getActivityStatus() == StatusOfLife.COMPLETE && activityId>0) {
+	          // Verificar limite de 5 submissões
+
+
+		         if (dto.getActivityFiles() == null || dto.getActivityFiles().isEmpty()) {
+		             throw new IllegalArgumentException("Nenhum arquivo enviado!");
+		         }
+		         dto.getActivityFiles().forEach(targetArchive -> {
+			         Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressEntityCompleted.getProgressId());
+			         if (submissionCount >= 5) {
+			             throw new ExcededMaxDelimiter("Limite de 5 entregas atingido para esta atividade!");
+			         }
+		             SubmissionEntity submissionEntity = new SubmissionEntity();
+		             submissionEntity.setProgress(progressEntityCompleted);
+		             try {
+		                 makeUploadAndDownloadArchive.saveArchive(targetArchive, submissionEntity, submissionsRepository);
+		             } catch (IOException e) {
+		                 throw new RuntimeException("Erro ao salvar arquivo: " + targetArchive.getOriginalFilename());
+		             }
+		         });
+		         
+
+		         
+		         return null;
+	      }
+	     ActivityProgressEntity progressEntity = progressRepository.findByUserTrailAndActivity(userId, trailId, progressMinePerStatus)
+	             .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado linha"));
+	     
+	     System.out.println("""
+	             ////////////////////////////////////////
+	             //////////////////////////////////////// ActivityId + = """ + progressEntity.getActivity().getActivityId());
+
+	     if (progressEntity.getActivityStatus() == StatusOfLife.ENABLE && progressEntity.getUser().getUserRole() == UserRoleEnum.ALUNO) {
+	         // Verificar limite de 5 submissões
+	         Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressEntity.getProgressId());
+	         if (submissionCount >= 5) {
+	             throw new IllegalStateException("Limite de 5 entregas atingido para esta atividade!");
+	         }
+
+	         progressEntity.setActivityStatus(StatusOfLife.COMPLETE);
+	         progressEntity.setUpdatedAt(LocalDate.now());
+	         progressRepository.save(progressEntity);
+	         RewardPackageEntity rewardPackageEntity = rewardRepository.findById(activityEntity.getRewardPackage().getRewardPackageId())
+	            		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
+	         ApprenticeInventoryEntity inventory = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryEquippedTrue(userId,ItemCatalogInventoryEnum.PET).orElse(null) ;
+	         if(inventory!=null) {
+	        	  PetEntity obtainPet = petRepository.findById(inventory.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Pet não encontrado!"));
+	        	  List<PetOutfitEntity> obtainOutfitsPet = petOutfitRepository.findByPet_petId(obtainPet.getPetId());
+	        	  ApprenticeInventoryEntity obtainEqquipedSkin =null;
+	        	  for( Integer i=0;i<obtainOutfitsPet.size();i++) {
+	        		  PetOutfitEntity getterOfOutfit = obtainOutfitsPet.get(i);
+	        		  obtainEqquipedSkin = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryItemId(userId, ItemCatalogInventoryEnum.SKIN,getterOfOutfit.getPetOutfitId()).orElseThrow(()-> new SoftNotFoundException("Pet recusou o acesso ao inventário -recomepsa"));
+	        		  if(obtainEqquipedSkin.isApprenticeInventoryEquipped()) {
+	        			  break;
+	        		  }
+	        	  }
+	        	  PetOutfitEntity petOutfitEntity = petOutfitRepository.findById(obtainEqquipedSkin.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Não encontramos o traje"));
+	        	  UserEntity userModifiedReward = rewardUtils.applyModifierInReward(userEntity, rewardPackageEntity, obtainPet, petOutfitEntity);
+	        	  usersRepository.save(userModifiedReward);
+	        	  System.out.println("MODIFICADA - - - - - Recompensa modificada "+" o xp = "+ userModifiedReward.getXp()+" e o money = " +userModifiedReward.getUserMoney()+" e a food = "+ userModifiedReward.getUserFood() );
+	        	  
+	        	  
+	         }else {
+	        	    userEntity.setUserFood(userEntity.getUserFood()+rewardPackageEntity.getRewardPackageFood());
+	   	         userEntity.setUserMoney(userEntity.getUserMoney() +rewardPackageEntity.getRewardPackageMoney());
+	   	         userEntity.setXp(userEntity.getXp() + rewardPackageEntity.getRewardPackageXp());
+	   	         usersRepository.save(userEntity);
+	   	      System.out.println("NOOOOOORMAL" );
+	         }
+	            
+	     
+	       
+	        
+	         if (dto.getActivityFiles() == null || dto.getActivityFiles().isEmpty()) {
+	             throw new IllegalArgumentException("Nenhum arquivo enviado!");
+	         }
+	     
+	         if (progressEntity.getActivityStatus() == StatusOfLife.COMPLETE) {
+	             dto.getActivityFiles().forEach(targetArchive -> {
+	                 SubmissionEntity submissionEntity = new SubmissionEntity();
+	                 submissionEntity.setProgress(progressEntity);
+	                 try {
+	                     makeUploadAndDownloadArchive.saveArchive(targetArchive, submissionEntity, submissionsRepository);
+	                 } catch (IOException e) {
+	                     throw new RuntimeException("Erro ao salvar arquivo: " + targetArchive.getOriginalFilename());
+	                 }
+	             });
+	             Long progressMinePerStatusDisable= progressRepository.findMinActivityIdPerStatus(userId, trailId,(long) 1) ;
+	             if(progressMinePerStatusDisable == null) {
+	            	 return null;
+	             }
+	             ActivityProgressEntity progressEntityAdvanced = progressRepository.findByUserTrailAndActivity(userId, trailId,progressMinePerStatusDisable)
+	                     .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado linha - 204"));
+	             
+
+	             progressEntityAdvanced.setActivityStatus(StatusOfLife.ENABLE);
+	             progressEntityAdvanced.setUpdatedAt(LocalDate.now());
+	             progressRepository.save(progressEntityAdvanced);
+	         }
+	     
+	     } else if (progressEntity.getActivityStatus() == StatusOfLife.COMPLETE) {
+	    	 return null;
+	     
+	     } else {
+	         throw new EntityNotFoundException("Usuario não é um aluno " + " atividade status " + progressEntity.getActivity().getActivityStatus().ordinal() + " Ordinal do usuário = " + progressEntity.getUser().getUserRole().ordinal());
+	     }
+	     tokenEntity.setUserFlags(tokenEntity.getUserFlags() - 1);
+	     dailyFlagsRepository.save(tokenEntity);
+	     return ResponseEntity.ok("Atividade Enviada com sucesso!");
 	 }
 	
 }

@@ -1,14 +1,25 @@
 package com.calygam.back.dtos;
 
+import java.util.List;
+
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
-import com.calygam.back.models.ActivityProgressEntity;
+import com.calygam.back.models.SubmissionEntity;
+import com.fasterxml.jackson.annotation.JsonInclude;
 
 public class ProgressSubmitActivityDTO {
 	
-	private MultipartFile activityFile;
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private Long submissionId;
+	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private List<MultipartFile> activityFiles;
+	
 	private String activitySubmitedFile;
+	
+	@JsonInclude(JsonInclude.Include.NON_NULL)
+	private String activityOriginalFileName;
 
 
 	public ProgressSubmitActivityDTO() {
@@ -16,13 +27,18 @@ public class ProgressSubmitActivityDTO {
 	}
 
 	
-	public ProgressSubmitActivityDTO(MultipartFile activityFile, String activitySubmitedFile) {
+
+	
+	public ProgressSubmitActivityDTO(List<MultipartFile> activityFiles, String activitySubmitedFile) {
 		super();
-		this.activityFile = activityFile;
+		this.activityFiles = activityFiles;
 		this.activitySubmitedFile = activitySubmitedFile;
 	}
-	
-	public ProgressSubmitActivityDTO (ActivityProgressEntity entity) {
+
+
+
+
+	public ProgressSubmitActivityDTO (SubmissionEntity entity) {
 		 this.activitySubmitedFile = ServletUriComponentsBuilder
 	                .fromCurrentContextPath()
 	                .path("/file/read/")         
@@ -32,13 +48,25 @@ public class ProgressSubmitActivityDTO {
 	
 
 
-	public MultipartFile getActivityFile() {
-		return activityFile;
+
+
+
+
+
+
+
+	public List<MultipartFile> getActivityFiles() {
+		return activityFiles;
 	}
-	
-	public void setActivityFile(MultipartFile activityFile) {
-		this.activityFile = activityFile;
+
+
+
+
+	public void setActivityFiles(List<MultipartFile> activityFiles) {
+		this.activityFiles = activityFiles;
 	}
+
+
 
 
 	public String getActivitySubmitedFile() {
@@ -49,6 +77,36 @@ public class ProgressSubmitActivityDTO {
 	public void setActivitySubmitedFile(String activitySubmitedFile) {
 		this.activitySubmitedFile = activitySubmitedFile;
 	}
+
+
+
+
+	public String getActivityOriginalFileName() {
+		return activityOriginalFileName;
+	}
+
+
+
+
+	public void setActivityOriginalFileName(String activityOriginalFileName) {
+		this.activityOriginalFileName = activityOriginalFileName;
+	}
+
+
+
+
+	public Long getSubmissionId() {
+		return submissionId;
+	}
+
+
+
+
+	public void setSubmissionId(Long submissionId) {
+		this.submissionId = submissionId;
+	}
+	
+	
 	
 	
 

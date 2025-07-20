@@ -8,7 +8,9 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.ProgressRepository;
+import com.calygam.back.repositories.SubmissionsRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 
@@ -22,6 +24,12 @@ public class ArchiveController {
 	    private TrailRepository trailRepository;
 	    @Autowired
 	    private ProgressRepository progressRepository;
+	    
+	    @Autowired
+	    private SubmissionsRepository submissionsRepository;
+	    
+	    @Autowired
+	    private PetOutfitRepository petOutfitRepository;
 
 	    @GetMapping("/read/{archiveName:.+}")
 	    public ResponseEntity<Resource> downloadTrailArchive(@PathVariable String archiveName) {
@@ -31,9 +39,15 @@ public class ArchiveController {
 	    
 	   
 
-	    @GetMapping("/read/progress/{archiveName:.+}")
+	    @GetMapping("/read/submission/{archiveName:.+}")
 	    public ResponseEntity<Resource> downloadProgressArchive(@PathVariable String archiveName) {
 	        System.out.println("🔍 Arquivo requisitado: " + archiveName);
-	        return uploadService.downloadArchive(archiveName, progressRepository);
+	        return uploadService.downloadArchive(archiveName, submissionsRepository);
+	    }
+	    
+	    @GetMapping("/read/skins/{archiveName:.+}")
+	    public ResponseEntity<Resource> downloadSkinArchive(@PathVariable String archiveName) {
+	        System.out.println("🔍 Arquivo requisitado: " + archiveName);
+	        return uploadService.downloadArchive(archiveName, petOutfitRepository);
 	    }
 }

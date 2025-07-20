@@ -16,6 +16,7 @@ import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OrderBy;
 import jakarta.persistence.Table;
 
 @Entity
@@ -33,10 +34,6 @@ public class TrailEntity implements GenericFileManagement {
 	@Column(name="trail_description", columnDefinition = "TEXT")
 	private String trailDescription;
 	
-	@Column(name="trail_price")
-	private Long trailPrice;
-	
-
 	
 	@Column(name="trail_created_date")
 	private LocalDate trailCreatedDate;
@@ -72,6 +69,7 @@ public class TrailEntity implements GenericFileManagement {
 	private String archiveType;
 	
 	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true)
+	@OrderBy("activityId ASC")
 	private List<ActivityEntity> activities = new ArrayList<>();
 	
 	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true )
@@ -89,7 +87,7 @@ public class TrailEntity implements GenericFileManagement {
 
 
 
-	public TrailEntity(Long trailId, String trailName, String trailDescription, Long trailPrice,
+	public TrailEntity(Long trailId, String trailName, String trailDescription,
 			LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword, StatusOfLife trailStatus,
 			Long trailVacancy, Long trailVacancies, UserEntity user, String archiveName, String originalName,
 			String archivePath, String archiveType, List<ActivityEntity> activities) {
@@ -97,7 +95,6 @@ public class TrailEntity implements GenericFileManagement {
 		this.trailId = trailId;
 		this.trailName = trailName;
 		this.trailDescription = trailDescription;
-		this.trailPrice = trailPrice;
 		this.trailCreatedDate = trailCreatedDate;
 		this.trailUpdatedDate = trailUpdatedDate;
 		this.trailPassword = trailPassword;
@@ -143,13 +140,7 @@ public class TrailEntity implements GenericFileManagement {
 		this.trailDescription = trailDescription;
 	}
 
-	public Long getTrailPrice() {
-		return trailPrice;
-	}
 
-	public void setTrailPrice(Long trailPrice) {
-		this.trailPrice = trailPrice;
-	}
 
 	public LocalDate getTrailCreatedDate() {
 		return trailCreatedDate;

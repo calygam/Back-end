@@ -26,6 +26,24 @@ public class SoftGlobalExceptions {
 		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
 	}
 	
+	@ExceptionHandler(SoftNotFoundException.class)
+	public ResponseEntity<String> GlobalSoftNotFoundException(SoftNotFoundException ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(OneValueIsNullException.class)
+	public ResponseEntity<String> GlobalOneValueIsNullException(OneValueIsNullException ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
+	
+	@ExceptionHandler(MissingMinRolesException.class)
+	public ResponseEntity<String> GlobalMissingMinRolesException(MissingMinRolesException ex){
+		return new ResponseEntity<>(ex.getMessage(),HttpStatus.BAD_REQUEST);
+	}
+	
+	
+	
+	
 	
 	
 }
