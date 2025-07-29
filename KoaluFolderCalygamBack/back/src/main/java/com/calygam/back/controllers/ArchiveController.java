@@ -12,6 +12,7 @@ import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.SubmissionsRepository;
 import com.calygam.back.repositories.TrailRepository;
+import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 
 @RestController
@@ -19,6 +20,9 @@ import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 public class ArchiveController {
 	  @Autowired
 	    private MakeUploadAndDownloadArchive uploadService;
+	  
+	  @Autowired
+	  private UsersRepository usersRepository;
 
 	    @Autowired
 	    private TrailRepository trailRepository;
@@ -30,6 +34,12 @@ public class ArchiveController {
 	    
 	    @Autowired
 	    private PetOutfitRepository petOutfitRepository;
+	    
+	    @GetMapping("/read/user/{archiveName:.+}")
+	    public ResponseEntity<Resource> downloadUserArchiveUrl(@PathVariable String archiveName) {
+	        System.out.println("🔍 Arquivo requisitado: " + archiveName);
+	        return uploadService.downloadArchive(archiveName, usersRepository);
+	    }
 
 	    @GetMapping("/read/{archiveName:.+}")
 	    public ResponseEntity<Resource> downloadTrailArchive(@PathVariable String archiveName) {

@@ -4,8 +4,10 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.calygam.back.dtos.ActivityProgressResponseDTO;
+import com.calygam.back.dtos.ProgressBarTrailDTO;
 import com.calygam.back.dtos.ProgressSubmitActivityDTO;
 import com.calygam.back.projections.ProgressAssignProjection;
+import com.calygam.back.projections.ProgressBarTrailProjection;
 import com.calygam.back.projections.SubmitedProgressProjection;
 
 
@@ -25,6 +27,16 @@ public class ActivityProgressMapper {
       
      
         return dto;
+	}
+        
+        public ProgressBarTrailDTO convertToProgressBarDTO(ProgressBarTrailProjection projection) {
+        	ProgressBarTrailDTO dto = new ProgressBarTrailDTO();
+            dto.setTotalActivitiesCompleted(projection.getTotalActivitiesCompleted());
+            dto.setTotalActivities(projection.getTotalActivities());
+            
+          
+         
+            return dto;
   
   
 }

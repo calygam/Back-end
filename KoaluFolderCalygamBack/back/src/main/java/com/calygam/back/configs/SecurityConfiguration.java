@@ -39,8 +39,9 @@ public class SecurityConfiguration {
 						.requestMatchers(HttpMethod.POST,"/emporium/add/item").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.POST,"/reward/create").hasRole("ADMIN")
 						.requestMatchers(HttpMethod.POST,"/emporium/purchase/obtain/item/{emporiumItemId}/type/{emporiumItemCatalogType}").hasRole("ALUNO")
-						
+						.requestMatchers("/file/read/user/**").permitAll()
 						.requestMatchers("/file/**").permitAll()
+						.requestMatchers("/file/read/**").permitAll()
 						.anyRequest().authenticated())
 				.addFilterBefore(mySecurityFilter, UsernamePasswordAuthenticationFilter.class)
 				.build();

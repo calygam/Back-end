@@ -13,6 +13,7 @@ import org.springframework.security.core.userdetails.UserDetails;
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.enums.UserStatus;
+import com.calygam.back.utils.GenericFileManagement;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
@@ -26,7 +27,7 @@ import jakarta.validation.constraints.Email;
 
 @Entity
 @Table(name = "tb_users")
-public class UserEntity implements UserDetails {
+public class UserEntity implements UserDetails,GenericFileManagement {
 	
 	@Id @GeneratedValue(strategy = GenerationType.IDENTITY)
 	@Column(name = "user_id")
@@ -48,8 +49,17 @@ public class UserEntity implements UserDetails {
 	@Column(name="user_password")
 	private String userPassword;
 	
-	@Column(name="user_image_perfil")
-	private String userImagePerfil;
+	@Column(name="user_archive_name")
+	private String archiveName;
+	
+	@Column(name="user_original_name")
+	private String originalName;
+	
+	@Column(name="user_archive_path")
+	private String archivePath;
+	
+	@Column(name="user_archive_type")
+	private String archiveType;
 	
 	
 	
@@ -92,7 +102,11 @@ public class UserEntity implements UserDetails {
 	
 	@OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<DailyFlagsEntity> flags = new ArrayList<DailyFlagsEntity>();
-
+	@OneToMany(mappedBy="user",cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MessageActivityEntity> messages = new ArrayList<MessageActivityEntity>();
+	
+	@OneToMany(mappedBy="recipient",cascade = CascadeType.ALL, orphanRemoval = true)
+	private List<MessageActivityEntity> recipients = new ArrayList<MessageActivityEntity>();
 
 
 
@@ -118,18 +132,18 @@ public class UserEntity implements UserDetails {
 
 	
 
-	public UserEntity(Long userId, String userProviderId, String userName,
+	/*public UserEntity(Long userId, String userProviderId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
-			String userPassword, String userImagePerfil, @CPF(message = "calygam<- CPF inválido") String userCpf,
+			String userPassword,  @CPF(message = "calygam<- CPF inválido") String userCpf,
 			Long userMoney,Long userFood, Long xp, UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus,
-			List<TrailEntity> trails, List<ActivityProgressEntity> progress,List<ControlApprenticePetEntity> pets,List<ApprenticeInventoryEntity> items,List<DailyFlagsEntity> flags) {
+			List<TrailEntity> trails, List<ActivityProgressEntity> progress,List<ControlApprenticePetEntity> pets,List<ApprenticeInventoryEntity> items,List<DailyFlagsEntity> flags,List<MessageActivityEntity> messages,List<MessageActivityEntity> recipients) {
 		super();
 		this.userId = userId;
 		this.userProviderId = userProviderId;
 		this.userName = userName;
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
-		this.userImagePerfil = userImagePerfil;
+
 		this.userCpf = userCpf;
 		this.userMoney = userMoney;
 		this.userFood = userFood;
@@ -141,7 +155,12 @@ public class UserEntity implements UserDetails {
 		this.pets = pets;
 		this.items = items;
 		this.flags = flags;
-	}
+		this.messages = messages;
+		this.recipients = recipients;
+		
+	}*/
+	
+	
 
 
 
@@ -163,6 +182,57 @@ public class UserEntity implements UserDetails {
 	public Long getUserId() {
 		return userId;
 	}
+	public UserEntity(Long userId, String userProviderId, String userName,
+			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
+			String userPassword, String archiveName, String originalName, String archivePath, String archiveType,
+			@CPF(message = "calygam<- CPF inválido") String userCpf, Long userMoney, Long userFood, Long xp,
+			UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus, List<TrailEntity> trails,
+			List<ActivityProgressEntity> progress, List<ApprenticeInventoryEntity> items,
+			List<ControlApprenticePetEntity> pets, List<DailyFlagsEntity> flags, List<MessageActivityEntity> messages,
+			List<MessageActivityEntity> recipients) {
+		super();
+		this.userId = userId;
+		this.userProviderId = userProviderId;
+		this.userName = userName;
+		this.userEmail = userEmail;
+		this.userPassword = userPassword;
+		this.archiveName = archiveName;
+		this.originalName = originalName;
+		this.archivePath = archivePath;
+		this.archiveType = archiveType;
+		this.userCpf = userCpf;
+		this.userMoney = userMoney;
+		this.userFood = userFood;
+		this.xp = xp;
+		this.userRank = userRank;
+		this.userRole = userRole;
+		this.userStatus = userStatus;
+		this.trails = trails;
+		this.progress = progress;
+		this.items = items;
+		this.pets = pets;
+		this.flags = flags;
+		this.messages = messages;
+		this.recipients = recipients;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
@@ -237,13 +307,160 @@ public class UserEntity implements UserDetails {
 		this.userRole = userRole;
 	}
 
-	public String getuserImagePerfil() {
-		return userImagePerfil;
+	
+	public String getArchiveName() {
+		return archiveName;
 	}
 
-	public void setuserImagePerfil(String userImagePerfil) {
-		this.userImagePerfil = userImagePerfil;
+
+
+	public void setArchiveName(String archiveName) {
+		this.archiveName = archiveName;
 	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public String getOriginalName() {
+		return originalName;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setOriginalName(String originalName) {
+		this.originalName = originalName;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public String getArchivePath() {
+		return archivePath;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setArchivePath(String archivePath) {
+		this.archivePath = archivePath;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public String getArchiveType() {
+		return archiveType;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setArchiveType(String archiveType) {
+		this.archiveType = archiveType;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 	public String getUserProviderId() {
 		return userProviderId;
 	}
@@ -374,6 +591,60 @@ public class UserEntity implements UserDetails {
 	public void setFlags(List<DailyFlagsEntity> flags) {
 		this.flags = flags;
 	}
+
+
+
+	public List<MessageActivityEntity> getMessages() {
+		return messages;
+	}
+
+	public void setMessages(List<MessageActivityEntity> messages) {
+		this.messages = messages;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public List<MessageActivityEntity> getRecipients() {
+		return recipients;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setRecipients(List<MessageActivityEntity> recipients) {
+		this.recipients = recipients;
+	}
+	
+	
 	
 	
 

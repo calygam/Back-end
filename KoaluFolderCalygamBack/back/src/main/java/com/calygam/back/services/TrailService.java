@@ -5,7 +5,6 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Optional;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -14,15 +13,18 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.calygam.back.dtos.ActivityDTO;
+import com.calygam.back.dtos.ProgressBarTrailDTO;
 import com.calygam.back.dtos.TrailDTO;
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.exceptions.UnauthorizedAcessUserException;
 import com.calygam.back.exceptions.UserAlreadExistsException;
+import com.calygam.back.mappers.ActivityProgressMapper;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.RewardPackageEntity;
 import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
+import com.calygam.back.projections.ProgressBarTrailProjection;
 import com.calygam.back.repositories.RewardRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.repositories.UsersRepository;
@@ -44,6 +46,9 @@ public class TrailService {
 	
 	@Autowired
 	private MakeUploadAndDownloadArchive makeUploadAndDownloadArchive;
+	
+	@Autowired
+	private ActivityProgressMapper activityProgressMapper;
 	
 	public TrailDTO createNewTrail(Long userId,TrailDTO trailDTO) throws IOException {
 		
@@ -104,8 +109,31 @@ public class TrailService {
 		return new TrailDTO(trailEntity);
 	}
 	
-	public List<TrailDTO> ReadAllTrailsOfTeachers() {
-	    return trailRepository.findAllTrailsWithActivitiesOfTeachers();
+	public List<TrailDTO> ReadAllTrailsOfTeachers(Long userId,String haveProgress) {
+		System.out.println("aaaaaaaaaaaaaaaaaaaaaaa = "+ haveProgress);
+		if(haveProgress !=null) {
+		if(haveProgress.equals("HAVE_PROGRESS")) {
+			List<TrailEntity> trails = trailRepository.foundTrailsByExistentProgress(userId);
+            List<ProgressBarTrailProjection> progressBars = trailRepository.getProgressToTrailBar(userId);
+
+            Map<Long, ProgressBarTrailDTO> progressMap = progressBars.stream()
+                .collect(Collectors.toMap(
+                	projection-> projection.getTrailId(),
+                    projection -> new ProgressBarTrailDTO(projection)
+                ));
+            return trails.stream()
+                    .map(trail -> new TrailDTO(trail, progressMap.get(trail.getTrailId())))
+                    .collect(Collectors.toList());
+		}else if(haveProgress.equals("NOT_HAVE_PROGRESS")){
+		return trailRepository.foundTrailsByNotExistsProgress(userId)
+	            .stream()
+	            .map(TrailDTO::new)
+	            .collect(Collectors.toList()); 
+		}
+		throw new SoftNotFoundException("Não conseguimos trazer as trilhase haveProgress nãaao é nulo ");
+		}
+		throw new SoftNotFoundException("Não conseguimos trazer as trilhas ");
+		
 	}
 	public List<TrailDTO> ReadAllTrailsOfOneTeacher(Long userId) {
 		   List<TrailDTO> trails = trailRepository.findAllTrailsWithActivitiesPerTeacher(userId);

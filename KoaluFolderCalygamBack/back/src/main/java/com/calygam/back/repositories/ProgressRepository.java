@@ -24,7 +24,7 @@ public interface ProgressRepository extends JpaRepository<ActivityProgressEntity
 	
 	@Query("SELECT CASE WHEN COUNT(p) > 0 THEN true ELSE false END " +
 	           "FROM ActivityProgressEntity p " +
-	           "WHERE p.user.id = :userId AND p.trail.id = :trailId")
+	           "WHERE p.user.userId = :userId AND p.trail.trailId = :trailId")
 	    boolean existsByUserIdAndTrailId(Long userId, Long trailId);
 	
 	

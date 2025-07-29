@@ -3,6 +3,8 @@ package com.calygam.back.dtos;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.enums.UserStatus;
@@ -28,17 +30,32 @@ public class DataUtilUserDTO {
 	public DataUtilUserDTO() {
 		super();
 	}
-	public DataUtilUserDTO(Long userId, String userName, String userEmail, String userCpf, Long userXp,
-			String userImage, UserRoleEnum userRole, Long userMoney) {
+	
+	public void generateImageUrl() {
+	    if (this.userImage != null && !this.userImage.isEmpty()) {
+	        this.userImage = ServletUriComponentsBuilder
+	            .fromCurrentContextPath()
+	            .path("/file/read/user/")
+	            .path(this.userImage)
+	            .toUriString();
+	    } else {
+	        this.userImage = "";
+	    }
+	}
+	
+	public DataUtilUserDTO(Long userId, String userName, String userEmail,String archiveName, String userCpf, Long userXp,
+			 UserRoleEnum userRole, Long userMoney) {
 		super();
 		this.userId = userId;
 		this.userName = userName;
 		this.userEmail = userEmail;
+		this.userImage = archiveName; 
+		
 		this.userCpf = userCpf;
 		this.userXp = userXp;
 		this.userRank = UserRankEnum.getRankForXpToString(userXp);
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
-		this.userImage = userImage;
+	
 		this.userRole = userRole;
 		this.userMoney = userMoney;
 
@@ -57,7 +74,7 @@ public class DataUtilUserDTO {
 		userXp = entity.getXp();
 		this.userRank = UserRankEnum.getRankForXpToString(userXp);
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
-		userImage = entity.getuserImagePerfil();
+	//	userImage = entity.getuserImagePerfil();
 		userMoney = entity.getUserMoney();
         this.trails = entity.getTrails() != null
                 ? entity.getTrails().stream()

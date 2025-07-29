@@ -54,6 +54,9 @@ public class ActivityEntity {
 	@OneToMany(mappedBy="activity",cascade=CascadeType.ALL,orphanRemoval=true)
 	private List<ActivityProgressEntity> progress = new ArrayList<>();
 	
+	@OneToMany(mappedBy="activity",cascade=CascadeType.ALL,orphanRemoval=true)
+	private List<MessageActivityEntity> messages = new ArrayList<MessageActivityEntity>();
+	
 	@ManyToOne
 	@JoinColumn(name="reward_package_id")
 	private RewardPackageEntity rewardPackage;
@@ -67,7 +70,7 @@ public class ActivityEntity {
 	public ActivityEntity(Long activityId, String activityName, String activityDescription,
 			DifficultyEnum activityDifficulty, StatusOfLife activityStatus, LocalDate activityCreatedAt,
 			LocalDate activityUpdatedAt, TrailEntity trail, List<ActivityProgressEntity> progress,
-			RewardPackageEntity rewardPackage) {
+			RewardPackageEntity rewardPackage,List<MessageActivityEntity> messages) {
 		super();
 		this.activityId = activityId;
 		this.activityName = activityName;
@@ -79,6 +82,7 @@ public class ActivityEntity {
 		this.trail = trail;
 		this.progress = progress;
 		this.rewardPackage = rewardPackage;
+		this.messages = messages;
 	}
 
 
@@ -167,6 +171,18 @@ public class ActivityEntity {
 
 	public void setRewardPackage(RewardPackageEntity rewardPackage) {
 		this.rewardPackage = rewardPackage;
+	}
+
+
+
+	public List<MessageActivityEntity> getMessages() {
+		return messages;
+	}
+
+
+
+	public void setMessages(List<MessageActivityEntity> messages) {
+		this.messages = messages;
 	}
 	
 	

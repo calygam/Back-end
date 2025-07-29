@@ -1,8 +1,8 @@
 package com.calygam.back.services;
 
 
+import java.io.IOException;
 import java.util.Optional;
-import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -14,11 +14,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.calygam.back.dtos.DataUtilUserDTO;
+import com.calygam.back.dtos.EditCredentialsDTO;
 import com.calygam.back.dtos.RegisterDTO;
 import com.calygam.back.dtos.RegisterResponseDTO;
 import com.calygam.back.enums.UserRankEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.enums.UserStatus;
+import com.calygam.back.exceptions.MissingMinRolesException;
+import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.exceptions.UserAlreadExistsException;
 import com.calygam.back.exceptions.UserNotIdentifiedException;
 import com.calygam.back.exceptions.UserServiceException;
@@ -28,6 +31,8 @@ import com.calygam.back.projections.AdminAnalisisProjection;
 import com.calygam.back.projections.TeacherDashProjection;
 import com.calygam.back.repositories.UserAuthRepository;
 import com.calygam.back.repositories.UsersRepository;
+import com.calygam.back.sucesshandlers.ApiSucessHandler;
+import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 
 
 
@@ -44,7 +49,67 @@ public class UsersServices {
 	private UserMappers userMappers;
 	
 	@Autowired
+	private BCryptPasswordEncoder encoder;
+	
+	@Autowired
 	private JwtUtilsId jwtUtilsId;
+	
+	@Autowired
+	private MakeUploadAndDownloadArchive makeUploadAndDownloadArchive;
+	
+	
+public ApiSucessHandler<String> EditCredentialsUser(Long userId,EditCredentialsDTO editCredentialsDTO) throws IOException {
+		if(!editCredentialsDTO.getUserEmail().isEmpty() && editCredentialsDTO.getUserEmail() !=null) {
+		if(userAuthRepository.findByUserEmail(editCredentialsDTO.getUserEmail())!=null) {
+			throw new UserAlreadExistsException("Usuário já existe na base -> E-mail!");
+		}
+		}
+		UserEntity userEntity = usersRepository.findById(userId).orElseThrow(()-> new SoftNotFoundException("Usuário não encontrado!"));
+		if(editCredentialsDTO.getUserName()!=null) {
+			userEntity.setUserName(editCredentialsDTO.getUserName());
+		}
+		
+		
+	
+		if(editCredentialsDTO.getUserEmail()!=null &&!editCredentialsDTO.getUserEmail().isEmpty()) {
+			
+		
+		userEntity.setUserEmail(editCredentialsDTO.getUserEmail());
+		}
+		if(editCredentialsDTO.getUserPassword()!=null && !editCredentialsDTO.getUserPassword().isEmpty()) {
+			
+		
+		String oldPurePassword = editCredentialsDTO.getUserPassword();
+		if(encoder.matches(oldPurePassword,userEntity.getPassword())  ) {
+			String newHashedPassword = encoder.encode(editCredentialsDTO.getUserNewPassword());
+			userEntity.setUserPassword(newHashedPassword);
+		}else {
+			throw new MissingMinRolesException("Senhas não condizem");
+		}
+		}
+		if(editCredentialsDTO.getUserMultipartFile() !=null && !editCredentialsDTO.getUserMultipartFile().isEmpty() ) {
+			if(userEntity.getArchiveName()!=null &&userEntity.getArchiveName()!="") {
+				
+				makeUploadAndDownloadArchive.deleteFile(userEntity.getArchiveName());
+				
+				makeUploadAndDownloadArchive.saveArchive(editCredentialsDTO.getUserMultipartFile(),userEntity,usersRepository)
+				;
+			}else {
+				makeUploadAndDownloadArchive.saveArchive(editCredentialsDTO.getUserMultipartFile(),userEntity,usersRepository);
+			}
+			
+		}else {
+			usersRepository.save(userEntity);
+		}
+	    
+		return new ApiSucessHandler<String>(true, "Credenciais modificadas com sucesso!", null);	
+	}
+	
+	
+	
+	
+	
+	
 	
 	public RegisterResponseDTO CreateANewUser(RegisterDTO registerDTO) {
 		
@@ -82,8 +147,9 @@ public class UsersServices {
 	
 	public Optional<DataUtilUserDTO> ReadInfoUserByIdService(String token){
 		Long userId = jwtUtilsId.getUserIdFromToken(token);
-		Optional<DataUtilUserDTO> userResponseDTO = usersRepository.findByUserId(userId);
-	    return userResponseDTO;
+		Optional<DataUtilUserDTO> dto = usersRepository.findByUserId(userId);
+		dto.ifPresent(DataUtilUserDTO::generateImageUrl);
+	    return dto;
 	}
 	
 	public Page<DataUtilUserDTO> ReadInfoUsersByRole(Pageable pageable){
@@ -112,7 +178,7 @@ public class UsersServices {
 			user.setUserEmail(email);
 			user.setUserStatus(UserStatus.ACTIVE);
 			user.setuserProviderId(id);
-			user.setuserImagePerfil(picture);
+		//	user.setuserImagePerfil(picture);
 			return usersRepository.save(user);
 		} catch (Exception e) {
 			throw new UserServiceException("Erro ao criar usuário Google", e);

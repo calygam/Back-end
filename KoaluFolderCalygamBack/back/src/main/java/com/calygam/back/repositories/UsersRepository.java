@@ -19,8 +19,8 @@ import com.calygam.back.projections.TeacherDashProjection;
 public interface UsersRepository extends JpaRepository<UserEntity,Long> {
 	
     @Query("SELECT new com.calygam.back.dtos.DataUtilUserDTO(" +
-            "u.userId, u.userName, u.userEmail, u.userCpf, u.xp, " +
-            " u.userImagePerfil,u.userRole, u.userMoney) " +
+            "u.userId, u.userName, u.userEmail,u.archiveName, u.userCpf, u.xp, " +
+            " u.userRole, u.userMoney) " +
             "FROM UserEntity u WHERE u.userId = :userId")
      Optional<DataUtilUserDTO> findByUserId(@Param("userId") Long userId);
     
@@ -49,7 +49,7 @@ public interface UsersRepository extends JpaRepository<UserEntity,Long> {
     	           u.user_email AS userEmail,
     	           u.user_cpf AS userCpf,
     	           u.user_xp AS xp,
-    	           u.user_image_perfil AS userImagePerfil,
+    	
     	           u.user_role AS userRole,
     	           u.user_money AS userMoney,
     	           u.user_status AS userStatus

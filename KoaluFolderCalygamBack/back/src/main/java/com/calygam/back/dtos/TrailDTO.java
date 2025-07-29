@@ -28,6 +28,8 @@ public class TrailDTO {
 	
 	private List<ActivityDTO> activities = new ArrayList<>();
 	private String calygamCode;
+	
+	private ProgressBarTrailDTO progressBarTrailDTO;
 
 
 	public TrailDTO() {
@@ -102,9 +104,33 @@ public class TrailDTO {
 		this.trailVacancies = trailVacancies;
 		this.user = user;
 	}
+	
+	
 
 
 
+
+
+	public TrailDTO(Long trailId, String trailName, String trailDescription, StatusOfLife trailStatus,
+			String trailImage, LocalDate trailCreatedDate, LocalDate trailUpdatedDate, String trailPassword,
+			Long trailVacancy, Long trailVacancies, Long user, List<ActivityDTO> activities, String calygamCode,
+			ProgressBarTrailDTO progressBarTrailDTO) {
+		super();
+		this.trailId = trailId;
+		this.trailName = trailName;
+		this.trailDescription = trailDescription;
+		this.trailStatus = trailStatus;
+		this.trailImage = trailImage;
+		this.trailCreatedDate = trailCreatedDate;
+		this.trailUpdatedDate = trailUpdatedDate;
+		this.trailPassword = trailPassword;
+		this.trailVacancy = trailVacancy;
+		this.trailVacancies = trailVacancies;
+		this.user = user;
+		this.activities = activities;
+		this.calygamCode = calygamCode;
+		this.progressBarTrailDTO = progressBarTrailDTO;
+	}
 
 
 	public TrailDTO(TrailEntity entity) {
@@ -129,6 +155,33 @@ public class TrailDTO {
 		this.activities = entity.getActivities().stream()
 		        .map(ActivityDTO::new) 
 		        .collect(Collectors.toList());
+		
+	}
+	//.s
+	public TrailDTO(TrailEntity entity,ProgressBarTrailDTO prog) {
+		super();
+		trailId = entity.getTrailId();
+		trailName = entity.getTrailName();
+		trailImage = entity.getArchiveName();
+		trailDescription = entity.getTrailDescription();
+		trailStatus = entity.getTrailStatus();
+	
+		trailCreatedDate = entity.getTrailCreatedDate();
+		trailUpdatedDate = entity.getTrailUpdatedDate();
+		
+		trailVacancy = entity.getTrailVacancy();
+		trailVacancies = entity.getTrailVacancies();
+		user = entity.getUser().getUserId();
+		 this.trailImage = ServletUriComponentsBuilder
+	                .fromCurrentContextPath()
+	                .path("/file/read/")         
+	                .path(entity.getArchiveName())
+	                .toUriString();
+		this.activities = entity.getActivities().stream()
+		        .map(ActivityDTO::new) 
+		        .collect(Collectors.toList());
+		this.progressBarTrailDTO = prog;
+		
 	}
 	
 
@@ -267,6 +320,18 @@ public class TrailDTO {
 	public void setTrailStatus(StatusOfLife trailStatus) {
 		this.trailStatus = trailStatus;
 	}
+
+
+	public ProgressBarTrailDTO getProgressBarTrailDTO() {
+		return progressBarTrailDTO;
+	}
+
+
+	public void setProgressBarTrailDTO(ProgressBarTrailDTO progressBarTrailDTO) {
+		this.progressBarTrailDTO = progressBarTrailDTO;
+	}
+	
+	
 	
 	
 	

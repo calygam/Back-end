@@ -11,6 +11,7 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.calygam.back.dtos.TrailDTO;
@@ -36,8 +37,10 @@ public class TrailController {
 		return trailService.createNewTrail(userId, trailDTO);
 	}
 	@GetMapping("/read/all-trails")
-	public List<TrailDTO> ReadAllTrailsOfTeachers() {
-		return trailService.ReadAllTrailsOfTeachers();
+	public List<TrailDTO> ReadAllTrailsOfTeachers(@RequestHeader("Authorization") String token,@RequestParam(value="haveProgress",required=false) String haveProgress) {
+		token = token.replace("Bearer ","");
+		Long userId = jwtUtilsId.getUserIdFromToken(token);
+		return trailService.ReadAllTrailsOfTeachers(userId,haveProgress);
 	}
 	@GetMapping("/read/by/teacher")
 	public List<TrailDTO> ReadAllTrailsOfOneTeacher(@RequestHeader("Authorization") String token) {

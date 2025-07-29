@@ -113,14 +113,19 @@ public class ProgressActivityService {
 	public List<ActivityProgressResponseDTO> progressAssignStudent(String trailPassword,Long userId, Long trailId)  {
 	    UserEntity userEntity = usersRepository.findEntityByUserId(userId)
 	        .orElseThrow(() -> new EntityNotFoundException("Usuario não encontrado"));
-	    if(userEntity.getUserRole().ordinal()<3) {
-	    	throw new UserAlreadExistsException("você é um professor!");
-	    }
+	 
 
 	    TrailEntity trailEntity = trailRepository.findById(trailId)
 	        .orElseThrow(() -> new EntityNotFoundException("Trilha não encontrada"));
+	    
+	    
+	    if(userEntity.getUserRole().ordinal()<3 && !trailEntity.getUser().getUserId().equals(userId)) {
+	    	throw new UserAlreadExistsException("você é um professor mas não pertence a essa trilha!");
+	    }
+	    
+	    
 	    AtomicInteger index = new AtomicInteger(0);
-	    if(trailEntity.getTrailVacancy()==trailEntity.getTrailVacancies()) {
+	    if(trailEntity.getTrailVacancy()>=trailEntity.getTrailVacancies()) {
 	    	throw new ExcededMaxDelimiter("Vagas excedidas!");
 	    }
 	    
@@ -128,7 +133,7 @@ public class ProgressActivityService {
 	    	 Boolean hasProgress = progressRepository
 	    	            .existsByUserIdAndTrailId(userId, trailId);
 	    	if(!hasProgress) {
-	    		trailEntity.setTrailVacancy(trailEntity.getTrailVacancy()+1);
+	    		
 	    		  List<ActivityProgressEntity> progressList = trailEntity.getActivities().stream()
 	    			        .map(activity -> {
 	    			            boolean isFirst = index.getAndIncrement() == 0;
@@ -138,7 +143,7 @@ public class ProgressActivityService {
 	    			            dto.setTrail(trailEntity);
 	    			            dto.setActivity(activity);
 
-	    			            return generateProgress.assignProgress(dto, isFirst);
+	    			            return generateProgress.assignProgress(dto, isFirst,userId,trailEntity);
 	    			        })
 	    			        .collect(Collectors.toList());
 
