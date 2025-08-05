@@ -38,4 +38,6 @@ public class PetController {
 	public List<PetDTO> searchAllPetsController(){
 		return petService.searchAllPetWithSkins();
 	}
+	//CAIO<- aqui vai ser o endpoint de alimentar o pet 
+	/*@PutMapping("/feed/")*/
 }

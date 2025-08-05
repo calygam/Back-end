@@ -10,13 +10,20 @@ import org.springframework.stereotype.Service;
 import com.calygam.back.dtos.CreatePetDTO;
 import com.calygam.back.dtos.NewOutfitDTO;
 import com.calygam.back.dtos.PetDTO;
+import com.calygam.back.enums.PetStatusEnergyEnum;
+import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.OneValueIsNullException;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.mappers.PetMapper;
+import com.calygam.back.models.ControlApprenticePetEntity;
 import com.calygam.back.models.PetEntity;
 import com.calygam.back.models.PetOutfitEntity;
+import com.calygam.back.models.UserEntity;
+import com.calygam.back.repositories.ControlApprenticePetRepository;
 import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.PetRepository;
+import com.calygam.back.repositories.UsersRepository;
+import com.calygam.back.sucesshandlers.ApiSucessHandler;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
 
 @Service
@@ -33,6 +40,10 @@ public class PetService {
 	
 	@Autowired
 	private PetMapper petMapper;
+	
+	@Autowired
+	private UsersRepository usersRepository;
+	@Autowired ControlApprenticePetRepository controlRepository;
 	
 	public String createANewPet(CreatePetDTO petDTO) throws IOException {
 		PetEntity verifyExists = petRepository.findByPetName(petDTO.getPetName()).orElse(null);
@@ -107,4 +118,64 @@ public class PetService {
 	public List<PetDTO> searchAllPetWithSkins(){
 	return petRepository.searchAllPets().stream().map(pet->petMapper.toPetDTO(pet)).collect(Collectors.toList());	
 	}
+	
+	
+	public ApiSucessHandler<String> feedOnePet(Long userId, Long petId,Boolean feedMax){
+		UserEntity userEntity = usersRepository.findById(userId).orElseThrow(()-> new SoftNotFoundException("Usuário não encontrado!"));
+		PetEntity petEntity = petRepository.findById(petId).orElseThrow(()-> new SoftNotFoundException("Pet não quer ser alimentado!"));
+		
+		ControlApprenticePetEntity controlApprenticePetEntity  = controlRepository.findByApprenticeUserIdAndPetId(userId, petId).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
+		Long maxEnergy = petEntity.getPetMaxEnergy();
+	    Long baseFraction = (maxEnergy != null) ? Math.round((double) maxEnergy / 10) : 0L;
+
+		if(feedMax!=null && feedMax) {
+			if(userEntity.getUserFood()>=baseFraction) {
+	
+		
+				for(Long multiplier =1L; multiplier<=10L ;multiplier++) {
+					
+					if(baseFraction<=userEntity.getUserFood() && baseFraction + controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
+						Long plusEnergy = controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction;
+						if(plusEnergy> petEntity.getPetMaxEnergy()) {
+							Long  remainingAmountNecessary = petEntity.getPetMaxEnergy() - controlApprenticePetEntity.getApprenticePetEnergy();
+							controlApprenticePetEntity.setApprenticePetEnergy(petEntity.getPetMaxEnergy());
+							userEntity.setUserFood(userEntity.getUserFood() - remainingAmountNecessary);
+						}else {
+						controlApprenticePetEntity.setApprenticePetEnergy(controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction);
+						userEntity.setUserFood(userEntity.getUserFood()-baseFraction);
+						}
+						if(controlApprenticePetEntity.getApprenticePetEnergy()>= petEntity.getPetMinEnergy()) {
+							controlApprenticePetEntity.setApprenticePetEnergyState(PetStatusEnergyEnum.HAPPY);
+							
+						}
+				
+					}else {
+						break;
+					}
+				}
+			}
+			return new ApiSucessHandler<String>(true, "Pet ganhou energia!", null);
+		}else if(userEntity.getUserFood()>=baseFraction)  {
+			if(baseFraction<=userEntity.getUserFood() && baseFraction + controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
+				Long plusEnergy = controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction;
+				if(plusEnergy> petEntity.getPetMaxEnergy()) {
+					Long  remainingAmountNecessary = petEntity.getPetMaxEnergy() - controlApprenticePetEntity.getApprenticePetEnergy();
+					controlApprenticePetEntity.setApprenticePetEnergy(petEntity.getPetMaxEnergy());
+					userEntity.setUserFood(userEntity.getUserFood() - remainingAmountNecessary);
+				}else {
+				controlApprenticePetEntity.setApprenticePetEnergy(controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction);
+				userEntity.setUserFood(userEntity.getUserFood()-baseFraction);
+				}
+				if(controlApprenticePetEntity.getApprenticePetEnergy()>= petEntity.getPetMinEnergy()) {
+					controlApprenticePetEntity.setApprenticePetEnergyState(PetStatusEnergyEnum.HAPPY);
+
+				}
+			}
+			return new ApiSucessHandler<String>(true, "Pet ganhou energia!", null);
+		}else {
+			throw new ExcededMaxDelimiter("O seu pet não pode ser alimentado!");
+		}
+		
+	}
+
 }

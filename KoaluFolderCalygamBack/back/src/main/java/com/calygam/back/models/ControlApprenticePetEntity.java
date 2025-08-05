@@ -107,4 +107,16 @@ public class ControlApprenticePetEntity {
 
 
 
+	public boolean isApprenticePetEquippedSkin() {
+		return apprenticePetEquippedSkin;
+	}
+
+
+
+	public void setApprenticePetEquippedSkin(boolean apprenticePetEquippedSkin) {
+		this.apprenticePetEquippedSkin = apprenticePetEquippedSkin;
+	}
+
+
+
 }

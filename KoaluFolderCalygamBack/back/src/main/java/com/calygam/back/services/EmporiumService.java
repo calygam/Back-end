@@ -15,6 +15,7 @@ import com.calygam.back.dtos.EmporiumStockDTO;
 import com.calygam.back.dtos.StockPetDTO;
 import com.calygam.back.dtos.StockSkinsDTO;
 import com.calygam.back.enums.ItemCatalogInventoryEnum;
+import com.calygam.back.enums.PetStatusEnergyEnum;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.MissingMinRolesException;
@@ -22,12 +23,14 @@ import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.mappers.CalygamEmporiumMappers;
 import com.calygam.back.models.ApprenticeInventoryEntity;
 import com.calygam.back.models.CalygamEmporiumEntity;
+import com.calygam.back.models.ControlApprenticePetEntity;
 import com.calygam.back.models.PetEntity;
 import com.calygam.back.models.PetOutfitEntity;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.projections.StockPetOutfitProjection;
 import com.calygam.back.projections.StockPetProjection;
 import com.calygam.back.repositories.ApprenticeInventoryRepository;
+import com.calygam.back.repositories.ControlApprenticePetRepository;
 import com.calygam.back.repositories.EmporiumRepository;
 import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.PetRepository;
@@ -54,6 +57,9 @@ public class EmporiumService {
 	
 	@Autowired
 	private CheckRequiredBeforePurchaseUtil checkRequiredBeforePurchaseUtil;
+	
+	@Autowired
+	private ControlApprenticePetRepository controlApprenticePetRepository;
 	
 	@Autowired
 	private CalygamEmporiumMappers calygamEmporiumMappers;
@@ -153,12 +159,25 @@ public class EmporiumService {
 										
 										apprenticeOutfitsInventoryEntity.setApprenticeInventoryItemId(outfit.getPetOutfitId());
 										apprenticeOutfitsInventoryEntity.setApprenticeInventoryTag(ItemCatalogInventoryEnum.SKIN);
-										apprenticeOutfitsInventoryEntity.setApprenticeInventoryEquipped(counter.get()==1?true:false);
+										apprenticeOutfitsInventoryEntity.setApprenticeInventoryEquipped(outfit.getPetOutfitPackageSkin().contains("EXHAUSTED")?true:false);
 										apprenticeOutfitsInventoryEntity.setApprenticeInventoryCreatedAt(LocalDateTime.now());
 										apprenticeOutfitsInventoryEntity.setApprentice(userEntity);
 										apprenticeInventoryRepository.save(apprenticeOutfitsInventoryEntity);
 										 counter.incrementAndGet();
 									});
+									
+									ControlApprenticePetEntity foundControl = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, petEntity.getPetId()).orElse(null);
+									ControlApprenticePetEntity controlApprenticePetEntity = new ControlApprenticePetEntity();
+
+									if(foundControl==null) {
+										controlApprenticePetEntity.setPet(petEntity);
+										controlApprenticePetEntity.setApprenticePetEnergy(petEntity.getPetDefaultEnergy());
+										controlApprenticePetEntity.setApprenticePetEnergyState(PetStatusEnergyEnum.EXHAUSTED);
+										
+										
+										controlApprenticePetEntity.setApprentice(userEntity);
+										controlApprenticePetRepository.save(controlApprenticePetEntity);
+									}
 								
 							
 	

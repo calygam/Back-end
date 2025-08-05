@@ -19,6 +19,7 @@ import com.calygam.back.dtos.ActivityProgressDTO;
 import com.calygam.back.dtos.ActivityProgressResponseDTO;
 import com.calygam.back.dtos.ProgressSubmitActivityDTO;
 import com.calygam.back.enums.ItemCatalogInventoryEnum;
+import com.calygam.back.enums.PetStatusEnergyEnum;
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.enums.UserRoleEnum;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
@@ -29,6 +30,7 @@ import com.calygam.back.mappers.ActivityProgressMapper;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.ApprenticeInventoryEntity;
+import com.calygam.back.models.ControlApprenticePetEntity;
 import com.calygam.back.models.DailyFlagsEntity;
 import com.calygam.back.models.PetEntity;
 import com.calygam.back.models.PetOutfitEntity;
@@ -40,6 +42,7 @@ import com.calygam.back.projections.ActivityProgressProjection;
 import com.calygam.back.projections.ProgressAssignProjection;
 import com.calygam.back.repositories.ActivityRepository;
 import com.calygam.back.repositories.ApprenticeInventoryRepository;
+import com.calygam.back.repositories.ControlApprenticePetRepository;
 import com.calygam.back.repositories.DailyFlagsRepository;
 import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.PetRepository;
@@ -101,6 +104,8 @@ public class ProgressActivityService {
 	@Autowired
 	private DailyFlagsRepository dailyFlagsRepository;
 	
+
+	
 	
 	
 	@Autowired
@@ -108,6 +113,9 @@ public class ProgressActivityService {
 	
 	@Autowired
 	private RewardUtils rewardUtils;
+	
+	@Autowired
+	private ControlApprenticePetRepository controlApprenticePetRepository;
 	
 	@Transactional
 	public List<ActivityProgressResponseDTO> progressAssignStudent(String trailPassword,Long userId, Long trailId)  {
@@ -273,10 +281,32 @@ public class ProgressActivityService {
 	        			  break;
 	        		  }
 	        	  }
+	        	  ControlApprenticePetEntity ctrlOfPet = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, obtainPet.getPetId()).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
 	        	  PetOutfitEntity petOutfitEntity = petOutfitRepository.findById(obtainEqquipedSkin.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Não encontramos o traje"));
-	        	  UserEntity userModifiedReward = rewardUtils.applyModifierInReward(userEntity, rewardPackageEntity, obtainPet, petOutfitEntity);
-	        	  usersRepository.save(userModifiedReward);
-	        	  System.out.println("MODIFICADA - - - - - Recompensa modificada "+" o xp = "+ userModifiedReward.getXp()+" e o money = " +userModifiedReward.getUserMoney()+" e a food = "+ userModifiedReward.getUserFood() );
+	        	  if(ctrlOfPet.getApprenticePetEnergyState().equals(PetStatusEnergyEnum.HAPPY)) {
+		        	  UserEntity userModifiedReward = rewardUtils.applyModifierInReward(userEntity, rewardPackageEntity, obtainPet, petOutfitEntity);
+		        	  usersRepository.save(userModifiedReward);
+
+		        	  Long LossEnergyPetCalculumn = (long) Math.round(obtainPet.getPetMaxEnergy()/5);
+		        	  if(ctrlOfPet.getApprenticePetEnergy()-LossEnergyPetCalculumn< 0L) {
+		            	  ctrlOfPet.setApprenticePetEnergy(0L);
+		        	  }else {
+		        		  ctrlOfPet.setApprenticePetEnergy(ctrlOfPet.getApprenticePetEnergy()-LossEnergyPetCalculumn);
+		        	  }
+		        	  
+		        	  if(ctrlOfPet.getApprenticePetEnergy()<obtainPet.getPetMinEnergy()) {
+		        		  ctrlOfPet.setApprenticePetEnergyState(PetStatusEnergyEnum.EXHAUSTED);
+		        	  }
+		        	  
+		        	  System.out.println("MODIFICADA - - - - - Recompensa modificada "+" o xp = "+ userModifiedReward.getXp()+" e o money = " +userModifiedReward.getUserMoney()+" e a food = "+ userModifiedReward.getUserFood() );
+		        	  controlApprenticePetRepository.save(ctrlOfPet);
+	        	  }else {
+	        		    userEntity.setUserFood(userEntity.getUserFood()+rewardPackageEntity.getRewardPackageFood());
+	   	   	         userEntity.setUserMoney(userEntity.getUserMoney() +rewardPackageEntity.getRewardPackageMoney());
+	   	   	         userEntity.setXp(userEntity.getXp() + rewardPackageEntity.getRewardPackageXp());
+	   	   	         usersRepository.save(userEntity);
+	        	  }
+
 	        	  
 	        	  
 	         }else {
