@@ -32,9 +32,17 @@ public class InventoryPetsDTO {
     private ItemCatalogInventoryEnum InventapprenticeInventoryTag;
     private Long apprenticeInventoryItemId;
     private boolean apprenticeInventoryEquipped;
+    private Long petMultiplierUp;
 	public InventoryPetsDTO() {
 		super();
 	}
+
+
+
+
+
+
+
 
 
 
@@ -46,7 +54,7 @@ public class InventoryPetsDTO {
 			Long apprenticePetEnergy, Long petMaxEnergy, Long petFeedQtd, Long petOutfitId,
 			PetStatusEnergyEnum petOutfitSkinMode, String petOutfitName, String petOutfitUrl,
 			Long apprenticeInventoryId, ItemCatalogInventoryEnum inventapprenticeInventoryTag,
-			Long apprenticeInventoryItemId, boolean apprenticeInventoryEquipped) {
+			Long apprenticeInventoryItemId, boolean apprenticeInventoryEquipped, Long petMultiplierUp) {
 		super();
 		this.petId = petId;
 		this.petName = petName;
@@ -68,7 +76,15 @@ public class InventoryPetsDTO {
 		InventapprenticeInventoryTag = inventapprenticeInventoryTag;
 		this.apprenticeInventoryItemId = apprenticeInventoryItemId;
 		this.apprenticeInventoryEquipped = apprenticeInventoryEquipped;
+		this.petMultiplierUp = petMultiplierUp;
 	}
+
+
+
+
+
+
+
 
 
 
@@ -180,6 +196,40 @@ public class InventoryPetsDTO {
 	public Long getPetFeedQtd() {
 		return petFeedQtd;
 	}
+	
+	
+
+
+
+	public Long getPetMultiplierUp() {
+		return petMultiplierUp;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+	public void setPetMultiplierUp(Long petMultiplierUp) {
+		this.petMultiplierUp = petMultiplierUp;
+	}
+
+
+
+
+
+
+
+
+
+
 
 
 

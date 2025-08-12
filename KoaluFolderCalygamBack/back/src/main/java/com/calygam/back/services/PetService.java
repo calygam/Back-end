@@ -2,6 +2,7 @@ package com.calygam.back.services;
 
 import java.io.IOException;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -10,15 +11,18 @@ import org.springframework.stereotype.Service;
 import com.calygam.back.dtos.CreatePetDTO;
 import com.calygam.back.dtos.NewOutfitDTO;
 import com.calygam.back.dtos.PetDTO;
+import com.calygam.back.enums.ItemCatalogInventoryEnum;
 import com.calygam.back.enums.PetStatusEnergyEnum;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.OneValueIsNullException;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.mappers.PetMapper;
+import com.calygam.back.models.ApprenticeInventoryEntity;
 import com.calygam.back.models.ControlApprenticePetEntity;
 import com.calygam.back.models.PetEntity;
 import com.calygam.back.models.PetOutfitEntity;
 import com.calygam.back.models.UserEntity;
+import com.calygam.back.repositories.ApprenticeInventoryRepository;
 import com.calygam.back.repositories.ControlApprenticePetRepository;
 import com.calygam.back.repositories.PetOutfitRepository;
 import com.calygam.back.repositories.PetRepository;
@@ -31,6 +35,9 @@ public class PetService {
 	
 	@Autowired
 	private PetRepository petRepository;
+	
+	@Autowired
+	private ApprenticeInventoryRepository apprenticeInventoryRepository;
 	
 	@Autowired 
 	private PetOutfitRepository petOutfitRepository;
@@ -129,23 +136,41 @@ public class PetService {
 	    Long baseFraction = (maxEnergy != null) ? Math.round((double) maxEnergy / 10) : 0L;
 
 		if(feedMax!=null && feedMax) {
-			if(userEntity.getUserFood()>=baseFraction) {
-	
+			System.out.println("ENTROU NO FEED!");
+			if(userEntity.getUserFood()>=baseFraction && controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
+				System.out.println("O USUÁRIO PODE PAGAR AO  MENOS UMA PARCELA!");
 		
 				for(Long multiplier =1L; multiplier<=10L ;multiplier++) {
 					
-					if(baseFraction<=userEntity.getUserFood() && baseFraction + controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
+					if(baseFraction<=userEntity.getUserFood() && controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
 						Long plusEnergy = controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction;
 						if(plusEnergy> petEntity.getPetMaxEnergy()) {
 							Long  remainingAmountNecessary = petEntity.getPetMaxEnergy() - controlApprenticePetEntity.getApprenticePetEnergy();
 							controlApprenticePetEntity.setApprenticePetEnergy(petEntity.getPetMaxEnergy());
 							userEntity.setUserFood(userEntity.getUserFood() - remainingAmountNecessary);
+
 						}else {
 						controlApprenticePetEntity.setApprenticePetEnergy(controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction);
+			
 						userEntity.setUserFood(userEntity.getUserFood()-baseFraction);
 						}
 						if(controlApprenticePetEntity.getApprenticePetEnergy()>= petEntity.getPetMinEnergy()) {
 							controlApprenticePetEntity.setApprenticePetEnergyState(PetStatusEnergyEnum.HAPPY);
+							AtomicInteger counter = new AtomicInteger(0);
+							ApprenticeInventoryEntity apprenticeInventoryItemSkinEquipped = apprenticeInventoryRepository.targetExistsByEquippedTrueAndPetId(petEntity.getPetId(),userId).orElseThrow(()->new SoftNotFoundException("Pet não permitiu acesso ao guarda roupa de novo"));
+							PetOutfitEntity petOutfitEntity = petOutfitRepository.findById(apprenticeInventoryItemSkinEquipped.getApprenticeInventoryItemId()) .orElseThrow(()-> new SoftNotFoundException("Acesso ao guarda-roupa porém skin recusa"));
+							String[] petIdentifiedPack = petOutfitEntity.getPetOutfitPackageSkin().split("_");
+							petEntity.getOutfits().forEach(outfit->{
+								if(counter.get()>=2)return;
+								String[] outfitParts = outfit.getPetOutfitPackageSkin().split("_");
+								if(outfitParts[0].length()>0 && outfitParts[0].contains(petIdentifiedPack[0])) {
+								ApprenticeInventoryEntity apprenticeOutfitsInventoryEntity = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryItemId(userId, ItemCatalogInventoryEnum.SKIN, outfit.getPetOutfitId()).orElseThrow(()->new SoftNotFoundException("pet se recusa a colocar a roupa :("));
+
+								apprenticeOutfitsInventoryEntity.setApprenticeInventoryEquipped(controlApprenticePetEntity.getApprenticePetEnergyState().equals(outfit.getPetOutfitSkinMode()));
+								apprenticeInventoryRepository.save(apprenticeOutfitsInventoryEntity);
+								 counter.incrementAndGet();
+								}
+							});
 							
 						}
 				
@@ -153,9 +178,12 @@ public class PetService {
 						break;
 					}
 				}
+			}else {
+				throw new ExcededMaxDelimiter("Ou não temos comida ou já estou cheio mestre");
 			}
+			controlRepository.save(controlApprenticePetEntity);
 			return new ApiSucessHandler<String>(true, "Pet ganhou energia!", null);
-		}else if(userEntity.getUserFood()>=baseFraction)  {
+		}else if(userEntity.getUserFood()>=baseFraction && controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy())  {
 			if(baseFraction<=userEntity.getUserFood() && baseFraction + controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
 				Long plusEnergy = controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction;
 				if(plusEnergy> petEntity.getPetMaxEnergy()) {
@@ -168,9 +196,25 @@ public class PetService {
 				}
 				if(controlApprenticePetEntity.getApprenticePetEnergy()>= petEntity.getPetMinEnergy()) {
 					controlApprenticePetEntity.setApprenticePetEnergyState(PetStatusEnergyEnum.HAPPY);
+					AtomicInteger counter = new AtomicInteger(0);
+					ApprenticeInventoryEntity apprenticeInventoryItemSkinEquipped = apprenticeInventoryRepository.targetExistsByEquippedTrueAndPetId(petEntity.getPetId(),userId).orElseThrow(()->new SoftNotFoundException("Pet não permitiu acesso ao guarda roupa de novo"));
+					PetOutfitEntity petOutfitEntity = petOutfitRepository.findById(apprenticeInventoryItemSkinEquipped.getApprenticeInventoryItemId()) .orElseThrow(()-> new SoftNotFoundException("Acesso ao guarda-roupa porém skin recusa"));
+					String[] petIdentifiedPack = petOutfitEntity.getPetOutfitPackageSkin().split("_");
+					petEntity.getOutfits().forEach(outfit->{
+						if(counter.get()>=2)return;
+						String[] outfitParts = outfit.getPetOutfitPackageSkin().split("_");
+						if(outfitParts[0].length()>0 && outfitParts[0].contains(petIdentifiedPack[0])) {
+						ApprenticeInventoryEntity apprenticeOutfitsInventoryEntity = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryItemId(userId, ItemCatalogInventoryEnum.SKIN, outfit.getPetOutfitId()).orElseThrow(()->new SoftNotFoundException("pet se recusa a colocar a roupa :("));
+
+						apprenticeOutfitsInventoryEntity.setApprenticeInventoryEquipped(controlApprenticePetEntity.getApprenticePetEnergyState().equals(outfit.getPetOutfitSkinMode()));
+						apprenticeInventoryRepository.save(apprenticeOutfitsInventoryEntity);
+						 counter.incrementAndGet();
+						}
+					});
 
 				}
 			}
+			controlRepository.save(controlApprenticePetEntity);
 			return new ApiSucessHandler<String>(true, "Pet ganhou energia!", null);
 		}else {
 			throw new ExcededMaxDelimiter("O seu pet não pode ser alimentado!");

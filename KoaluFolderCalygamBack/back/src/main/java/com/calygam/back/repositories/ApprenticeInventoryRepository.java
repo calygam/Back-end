@@ -85,7 +85,7 @@ public interface ApprenticeInventoryRepository extends JpaRepository<ApprenticeI
 				AND invSkin.user_id = :userId
 				AND ctrl.user_id = :userId
 			    AND inv.apprentice_inventory_tag = 0  
-			    AND inv.apprentice_inventory_equipped = 0  AND invSkin.apprentice_inventory_tag = 1  
+			    AND invSkin.apprentice_inventory_tag = 1  
 			    AND invSkin.apprentice_inventory_equipped = 1
 			""",nativeQuery=true)
 	List<InventoryPetsProjection> getInventoryPetsOfOneUser(@Param("userId") Long userId);
@@ -136,4 +136,57 @@ public interface ApprenticeInventoryRepository extends JpaRepository<ApprenticeI
 			    AND invSkin.apprentice_inventory_equipped = 1
 			""",nativeQuery=true)
 	InventoryPetsProjection getInventoryPetEquipped(@Param("userId") Long userId);
+	
+	
+	
+	
+	
+	
+	
+	@Query(value="""
+       			SELECT 
+			    pet.pet_id AS petId,
+			    pet.pet_name AS petName,
+			    pet.pet_boost_money AS petBoostMoney,
+			    pet.pet_boost_xp AS petBoostXp,
+			    pet.pet_boost_food AS petBoostFood,
+			       skin.pet_outfit_plus_money as petOutfitPlusMoney,
+			    skin.pet_outfit_plus_xp as petOutfitPlusXp,
+			    skin.pet_outfit_plus_food as petOutfitPlusFood,
+			    pet.pet_min_energy AS petMinEnergy,
+			    ctrl.apprentice_pet_energy AS apprenticePetEnergy,
+			    pet.pet_max_energy AS petMaxEnergy,
+			
+			    skin.pet_outfit_id AS petOutfitId,
+			    skin.pet_outfit_skin_mode AS petOutfitSkinMode,
+			    skin.pet_outfit_name AS petOutfitName,
+			    skin.pet_outfit_archive_name AS petOutfitArchiveName,
+			
+			    inv.apprentice_inventory_id AS apprenticeInventoryId,
+			    invSkin.apprentice_inventory_tag AS apprenticeInventoryTag,
+			    inv.apprentice_inventory_item_id AS apprenticeInventoryItemId,
+			    invSkin.apprentice_inventory_equipped AS apprenticeInventoryEquipped
+			    
+			FROM tb_pets pet 
+			
+			INNER JOIN tb_pet_outfits skin 
+			    ON skin.pet_id = pet.pet_id 
+			    
+			INNER JOIN tb_control_apprentice_x_pet ctrl ON ctrl.pet_id = pet.pet_id
+
+			INNER JOIN tb_apprentice_inventory invSkin 
+			    ON invSkin.apprentice_inventory_item_id = skin.pet_outfit_id
+			    
+			INNER JOIN tb_apprentice_inventory inv 
+			    ON inv.apprentice_inventory_item_id = pet.pet_id
+			    
+			WHERE   inv.user_id= 1 
+				AND invSkin.user_id = 1
+				AND ctrl.user_id = 1
+                AND ctrl.apprentice_pet_energy_state = skin.pet_outfit_skin_mode
+			    AND inv.apprentice_inventory_tag = 0  
+			    AND invSkin.apprentice_inventory_tag = 1  
+				AND inv.apprentice_inventory_equipped = 1
+			""",nativeQuery=true)
+	List<InventoryPetsProjection> getInventoryPetEquippedSkins(@Param("userId") Long userId);
 }

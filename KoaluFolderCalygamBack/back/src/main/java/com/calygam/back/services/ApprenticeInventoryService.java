@@ -169,17 +169,33 @@ public class ApprenticeInventoryService {
 	}
 	
 	public List<InventoryPetsDTO> getInvPets(Long userId){
+		UserEntity userEntity = usersRepository.findById(userId).orElseThrow(()-> new SoftNotFoundException("Ops não te encontramos"));
 		return apprenticeInventoryRepository.getInventoryPetsOfOneUser(userId)
 				.stream()
-				.map(inv -> inventoryMappers.toInvPetsDTO(inv)).collect(Collectors.toList());
+				.map(inv -> inventoryMappers.toInvPetsDTO(inv,userEntity.getUserFood())).collect(Collectors.toList());
 		
 		
 	}
 	
 	public InventoryPetsDTO getPetEquipped(Long userId){
-		InventoryPetsDTO petEquipped = inventoryMappers.toInvPetsDTO(apprenticeInventoryRepository.getInventoryPetEquipped(userId)) ;
+		UserEntity userEntity = usersRepository.findById(userId).orElseThrow(()-> new SoftNotFoundException("Ops não te encontramos"));
+		if(	apprenticeInventoryRepository.getInventoryPetEquipped(userId)!=null) {
+	
+		InventoryPetsDTO petEquipped = inventoryMappers.toInvPetsDTO(apprenticeInventoryRepository.getInventoryPetEquipped(userId),userEntity.getUserFood()) ;
+	
 		
 		return petEquipped;
+		}else {
+			return null;
+		}
+		
+	}
+	
+	public List<InventoryPetsDTO> getPetEquippedSkins(Long userId){
+		UserEntity userEntity = usersRepository.findById(userId).orElseThrow(()-> new SoftNotFoundException("Ops não te encontramos"));
+		return apprenticeInventoryRepository.getInventoryPetEquippedSkins(userId)
+				.stream()
+				.map(inv -> inventoryMappers.toInvPetsDTO(inv,userEntity.getUserFood())).collect(Collectors.toList());
 		
 	}
 

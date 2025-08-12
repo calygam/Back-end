@@ -270,8 +270,10 @@ public class ProgressActivityService {
 	         RewardPackageEntity rewardPackageEntity = rewardRepository.findById(activityEntity.getRewardPackage().getRewardPackageId())
 	            		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
 	         ApprenticeInventoryEntity inventory = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryEquippedTrue(userId,ItemCatalogInventoryEnum.PET).orElse(null) ;
-	         if(inventory!=null) {
-	        	  PetEntity obtainPet = petRepository.findById(inventory.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Pet não encontrado!"));
+       	  PetEntity obtainPet = petRepository.findById(inventory.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Pet não encontrado!"));
+    	  ControlApprenticePetEntity ctrlOfPet = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, obtainPet.getPetId()).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
+	         if(inventory!=null && ctrlOfPet.getApprenticePetEnergyState().equals(PetStatusEnergyEnum.HAPPY)) {
+	
 	        	  List<PetOutfitEntity> obtainOutfitsPet = petOutfitRepository.findByPet_petId(obtainPet.getPetId());
 	        	  ApprenticeInventoryEntity obtainEqquipedSkin =null;
 	        	  for( Integer i=0;i<obtainOutfitsPet.size();i++) {
@@ -281,13 +283,13 @@ public class ProgressActivityService {
 	        			  break;
 	        		  }
 	        	  }
-	        	  ControlApprenticePetEntity ctrlOfPet = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, obtainPet.getPetId()).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
+
 	        	  PetOutfitEntity petOutfitEntity = petOutfitRepository.findById(obtainEqquipedSkin.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Não encontramos o traje"));
 	        	  if(ctrlOfPet.getApprenticePetEnergyState().equals(PetStatusEnergyEnum.HAPPY)) {
 		        	  UserEntity userModifiedReward = rewardUtils.applyModifierInReward(userEntity, rewardPackageEntity, obtainPet, petOutfitEntity);
 		        	  usersRepository.save(userModifiedReward);
 
-		        	  Long LossEnergyPetCalculumn = (long) Math.round(obtainPet.getPetMaxEnergy()/5);
+		        	  Long LossEnergyPetCalculumn = (long) Math.round(obtainPet.getPetMaxEnergy()/10);
 		        	  if(ctrlOfPet.getApprenticePetEnergy()-LossEnergyPetCalculumn< 0L) {
 		            	  ctrlOfPet.setApprenticePetEnergy(0L);
 		        	  }else {
@@ -296,6 +298,21 @@ public class ProgressActivityService {
 		        	  
 		        	  if(ctrlOfPet.getApprenticePetEnergy()<obtainPet.getPetMinEnergy()) {
 		        		  ctrlOfPet.setApprenticePetEnergyState(PetStatusEnergyEnum.EXHAUSTED);
+		        		  AtomicInteger counter = new AtomicInteger(0);
+		      			//ApprenticeInventoryEntity apprenticeInventoryItemSkinEquipped = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryEquippedTrue(userId, ItemCatalogInventoryEnum.SKIN).orElseThrow(()->new SoftNotFoundException("Pet não permitiu acesso ao guarda roupa de novo"));
+
+		      			String[] petIdentifiedPack = petOutfitEntity.getPetOutfitPackageSkin().split("_");
+		      			obtainPet.getOutfits().forEach(outfit->{
+		      				if(counter.get()>=2)return;
+		      				String[] outfitParts = outfit.getPetOutfitPackageSkin().split("_");
+		      				if(outfitParts[0].length()>0 && outfitParts[0].contains(petIdentifiedPack[0])) {
+		      				ApprenticeInventoryEntity apprenticeOutfitsInventoryEntity = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryItemId(userId, ItemCatalogInventoryEnum.SKIN, outfit.getPetOutfitId()).orElseThrow(()->new SoftNotFoundException("pet se recusa a colocar a roupa :("));
+
+		      				apprenticeOutfitsInventoryEntity.setApprenticeInventoryEquipped(ctrlOfPet.getApprenticePetEnergyState().equals(outfit.getPetOutfitSkinMode()));
+		      				apprenticeInventoryRepository.save(apprenticeOutfitsInventoryEntity);
+		      				 counter.incrementAndGet();
+		      				}
+		      			});
 		        	  }
 		        	  
 		        	  System.out.println("MODIFICADA - - - - - Recompensa modificada "+" o xp = "+ userModifiedReward.getXp()+" e o money = " +userModifiedReward.getUserMoney()+" e a food = "+ userModifiedReward.getUserFood() );

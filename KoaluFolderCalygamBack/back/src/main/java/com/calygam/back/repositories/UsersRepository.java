@@ -49,6 +49,7 @@ public interface UsersRepository extends JpaRepository<UserEntity,Long> {
     	           u.user_email AS userEmail,
     	           u.user_cpf AS userCpf,
     	           u.user_xp AS xp,
+    	           u.user_archive_name AS userImagePerfil,
     	
     	           u.user_role AS userRole,
     	           u.user_money AS userMoney,

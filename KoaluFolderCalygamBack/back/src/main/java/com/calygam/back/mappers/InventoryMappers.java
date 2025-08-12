@@ -11,13 +11,26 @@ import com.calygam.back.projections.InventoryPetsProjection;
 @Component
 public class InventoryMappers {
 	
-	public InventoryPetsDTO toInvPetsDTO(InventoryPetsProjection invP) {
+	public InventoryPetsDTO toInvPetsDTO(InventoryPetsProjection invP,Long userFood) {
 		InventoryPetsDTO invPetsDTO = new InventoryPetsDTO();
+	    Long maxEnergy = invP.getPetMaxEnergy();
+	    Long baseFraction = (maxEnergy != null) ? Math.round((double) maxEnergy / 10) : 0L;
 		invPetsDTO.setPetId(invP.getPetId());
 		invPetsDTO.setPetName(invP.getPetName());
 		invPetsDTO.setPetBoostMoney(invP.getPetBoostMoney());
 		invPetsDTO.setPetBoostXp(invP.getPetBoostXp());
 		invPetsDTO.setPetBoostFood(invP.getPetBoostFood());
+		
+		for(Long i=1L; i<=10L;i++){
+	        Long TargetMultiplier = baseFraction*i;
+	      
+	        if(TargetMultiplier + invP.getApprenticePetEnergy()>=maxEnergy || TargetMultiplier + invP.getApprenticePetEnergy()>userFood){
+	        	invPetsDTO.setPetMultiplierUp(i);
+	         break;
+	          
+	        }
+	      }
+		
 		if(invP.getPetOutfitPlusMoney()!=null&&invP.getPetOutfitPlusMoney()>0L) {
 			invPetsDTO.setPetOutfitPlusMoney(invP.getPetOutfitPlusMoney());
 		}else {
@@ -36,8 +49,7 @@ public class InventoryMappers {
 	    invPetsDTO.setPetMinEnergy(invP.getPetMinEnergy());
 	    invPetsDTO.setApprenticePetEnergy(invP.getApprenticePetEnergy());
 	    invPetsDTO.setPetMaxEnergy(invP.getPetMaxEnergy());
-	    Long maxEnergy = invP.getPetMaxEnergy();
-	    Long baseFraction = (maxEnergy != null) ? Math.round((double) maxEnergy / 10) : 0L;
+
 	    invPetsDTO.setPetFeedQtd(baseFraction);
 
 	    invPetsDTO.setPetOutfitId(invP.getPetOutfitId());

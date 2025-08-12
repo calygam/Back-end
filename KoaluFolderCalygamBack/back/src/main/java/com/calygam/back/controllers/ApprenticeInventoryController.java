@@ -61,4 +61,11 @@ public class ApprenticeInventoryController {
 		return apprenticeInventoryService.getPetEquipped(userId);
 	}
 	
+	@GetMapping("/get/pet/skins")
+	public List<InventoryPetsDTO> getPetEquippedSkins(@RequestHeader("Authorization") String token){
+		token = token.replace("Bearer ","");
+		Long userId = jwtUtilsId.getUserIdFromToken(token);
+		return apprenticeInventoryService.getPetEquippedSkins(userId);
+	}
+	
 }
