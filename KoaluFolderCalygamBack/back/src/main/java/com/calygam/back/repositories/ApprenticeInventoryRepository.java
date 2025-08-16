@@ -180,9 +180,9 @@ public interface ApprenticeInventoryRepository extends JpaRepository<ApprenticeI
 			INNER JOIN tb_apprentice_inventory inv 
 			    ON inv.apprentice_inventory_item_id = pet.pet_id
 			    
-			WHERE   inv.user_id= 1 
-				AND invSkin.user_id = 1
-				AND ctrl.user_id = 1
+			WHERE   inv.user_id= :userId 
+				AND invSkin.user_id =:userId
+				AND ctrl.user_id =:userId
                 AND ctrl.apprentice_pet_energy_state = skin.pet_outfit_skin_mode
 			    AND inv.apprentice_inventory_tag = 0  
 			    AND invSkin.apprentice_inventory_tag = 1  

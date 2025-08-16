@@ -10,14 +10,18 @@ import com.calygam.back.dtos.SendMessageDTO;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.models.ActivityEntity;
+import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.MessageActivityEntity;
 
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.repositories.ActivityRepository;
 
 import com.calygam.back.repositories.MessageActivityRepository;
+import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.sucesshandlers.ApiSucessHandler;
+
+import jakarta.persistence.EntityNotFoundException;
 
 @Service
 public class MessageActivityService {
@@ -29,6 +33,9 @@ public class MessageActivityService {
 	private MessageActivityRepository messageActivityRepository;
 	
 	@Autowired
+	private ProgressRepository progressRepository;
+	
+	@Autowired
 	private UsersRepository usersRepository;
 	
 	//caio<- e pode ter também alguem que mande mensagem para outra pessoa como resposta
@@ -37,6 +44,9 @@ public class MessageActivityService {
 	public ApiSucessHandler<String> sendMessageOrFeedBack(SendMessageDTO messageDTO,Long userId,Long activityId,Long messageActivityId){
 		ActivityEntity activityEntity = activityRepository.findById(activityId)
 				.orElseThrow(()-> new SoftNotFoundException("Atividade não encontrada!")); 
+		
+	     ActivityProgressEntity progressEntityCompleted = progressRepository.findByUserTrailAndActivity(userId, activityEntity.getTrail().getTrailId(), activityId)
+	             .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado"));
 		
 		UserEntity userRequestMassageEntity = usersRepository.findById(userId)
 				.orElseThrow(()-> new SoftNotFoundException("Usuário não encontrado!"));

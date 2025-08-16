@@ -1,6 +1,7 @@
 package com.calygam.back.models;
 
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -24,7 +25,7 @@ public class DailyFlagsEntity {
 	private UserEntity user;
 	
 	@Column(name="daily_flag_created_at")
-	private LocalDate dailyFlagCreatedAt;
+	private LocalDateTime dailyFlagCreatedAt;
 	
 	@Column(name="user_flags")
 	private Long userFlags;
@@ -33,7 +34,7 @@ public class DailyFlagsEntity {
 		super();
 	}
 
-	public DailyFlagsEntity(Long dailyFlagId, UserEntity user, LocalDate dailyFlagCreatedAt, Long userFlags) {
+	public DailyFlagsEntity(Long dailyFlagId, UserEntity user, LocalDateTime dailyFlagCreatedAt, Long userFlags) {
 		super();
 		DailyFlagId = dailyFlagId;
 		this.user = user;
@@ -57,11 +58,11 @@ public class DailyFlagsEntity {
 		this.user = user;
 	}
 
-	public LocalDate getDailyFlagCreatedAt() {
+	public LocalDateTime getDailyFlagCreatedAt() {
 		return dailyFlagCreatedAt;
 	}
 
-	public void setDailyFlagCreatedAt(LocalDate dailyFlagCreatedAt) {
+	public void setDailyFlagCreatedAt(LocalDateTime dailyFlagCreatedAt) {
 		this.dailyFlagCreatedAt = dailyFlagCreatedAt;
 	}
 

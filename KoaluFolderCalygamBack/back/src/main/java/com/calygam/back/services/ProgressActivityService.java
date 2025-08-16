@@ -1,7 +1,9 @@
 package com.calygam.back.services;
 
 import java.io.IOException;
+import java.time.Duration;
 import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -212,8 +214,12 @@ public class ProgressActivityService {
 	     }
 	     
 	     DailyFlagsEntity tokenEntity = dailyFlagsService.collectOrGenerateFlags(userEntity);
+			LocalDateTime targetHours = dailyFlagsRepository.getDatabaseCurrentTimeStamp();
 	     if (tokenEntity.getUserFlags() <= 0) {
-	         throw new ExcededMaxDelimiter("Limite diário de bandeiras gastas. Tente novamente amanhã.");
+	    	 Duration duration = Duration.between(targetHours, tokenEntity.getDailyFlagCreatedAt().plus(Duration.ofMinutes(100)));
+	    	 Long hour = duration.toHours();
+	    	 long minuts = duration.toMinutes()% 60;
+	         throw new ExcededMaxDelimiter("Entregas - Limite atingido. Tente novamente em " + hour+"h e " +minuts+" minutos.");
 	     }
 
 
@@ -270,10 +276,13 @@ public class ProgressActivityService {
 	         RewardPackageEntity rewardPackageEntity = rewardRepository.findById(activityEntity.getRewardPackage().getRewardPackageId())
 	            		.orElseThrow(()-> new SoftNotFoundException("Eita!, recompensa não encontrada :("));
 	         ApprenticeInventoryEntity inventory = apprenticeInventoryRepository.findByApprentice_UserIdAndApprenticeInventoryTagAndApprenticeInventoryEquippedTrue(userId,ItemCatalogInventoryEnum.PET).orElse(null) ;
-       	  PetEntity obtainPet = petRepository.findById(inventory.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Pet não encontrado!"));
-    	  ControlApprenticePetEntity ctrlOfPet = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, obtainPet.getPetId()).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
-	         if(inventory!=null && ctrlOfPet.getApprenticePetEnergyState().equals(PetStatusEnergyEnum.HAPPY)) {
-	
+
+	         if(inventory!=null) {
+	          	  PetEntity obtainPet = petRepository.findById(inventory.getApprenticeInventoryItemId()).orElseThrow(()-> new SoftNotFoundException("Pet não encontrado!"));
+	        	  ControlApprenticePetEntity ctrlOfPet = controlApprenticePetRepository.findByApprenticeUserIdAndPetId(userId, obtainPet.getPetId()).orElseThrow(()-> new SoftNotFoundException("Controle não encontrado!"));
+	        	 if(ctrlOfPet.getApprenticePetEnergyState().equals(PetStatusEnergyEnum.HAPPY)) {
+	        		 
+	        	 
 	        	  List<PetOutfitEntity> obtainOutfitsPet = petOutfitRepository.findByPet_petId(obtainPet.getPetId());
 	        	  ApprenticeInventoryEntity obtainEqquipedSkin =null;
 	        	  for( Integer i=0;i<obtainOutfitsPet.size();i++) {
@@ -317,6 +326,7 @@ public class ProgressActivityService {
 		        	  
 		        	  System.out.println("MODIFICADA - - - - - Recompensa modificada "+" o xp = "+ userModifiedReward.getXp()+" e o money = " +userModifiedReward.getUserMoney()+" e a food = "+ userModifiedReward.getUserFood() );
 		        	  controlApprenticePetRepository.save(ctrlOfPet);
+	        	  }
 	        	  }else {
 	        		    userEntity.setUserFood(userEntity.getUserFood()+rewardPackageEntity.getRewardPackageFood());
 	   	   	         userEntity.setUserMoney(userEntity.getUserMoney() +rewardPackageEntity.getRewardPackageMoney());

@@ -1,7 +1,7 @@
 package com.calygam.back.services;
 
-import java.time.LocalDate;
-import java.time.ZoneId;
+import java.time.Duration;
+import java.time.LocalDateTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -17,26 +17,22 @@ public class DailyFlagsService {
 	
 	//caio<- vamos gerar as bandeiras que o usuário vai ter no dia
 	public DailyFlagsEntity collectOrGenerateFlags(UserEntity user) {
-		LocalDate flagsInToday = dailyFlagsRepository.getDatabaseCurrentDate();
-		System.out.println("""
-				////////////////////////////////////
-				///////////////////////////////////
-				///////////////////////////////////
-				///////////////////////////////////
-				////////////////////////////////////
-				///////////////////////////////////
-				""");
-		System.out.println("VEEEEEEEEM ISSSSSO = + = " + flagsInToday );
-		return 
-		dailyFlagsRepository
-		.findByUser_userIdAndDailyFlagCreatedAt(user.getUserId(), flagsInToday)
-		.orElseGet(()->{
-			DailyFlagsEntity flagsForToday = new DailyFlagsEntity();
-			flagsForToday.setUser(user);
-			flagsForToday.setDailyFlagCreatedAt(dailyFlagsRepository.getDatabaseCurrentDate());
-			flagsForToday.setUserFlags(3L);
-			return dailyFlagsRepository.save(flagsForToday);
-		});
+		LocalDateTime targetHours = dailyFlagsRepository.getDatabaseCurrentTimeStamp();
+		DailyFlagsEntity flagsOfUser =  dailyFlagsRepository
+		.findTopByUser_userIdOrderByDailyFlagCreatedAtDesc(user.getUserId()).orElse(null);
+		
+		if(flagsOfUser!=null && targetHours.isBefore(flagsOfUser.getDailyFlagCreatedAt().plus(Duration.ofMinutes(100)))) {
+			return flagsOfUser;
+		}else {
+	
+
+		DailyFlagsEntity flagsForToday = new DailyFlagsEntity();
+		flagsForToday.setUser(user);
+		flagsForToday.setDailyFlagCreatedAt(dailyFlagsRepository.getDatabaseCurrentTimeStamp());
+		flagsForToday.setUserFlags(4L);
+		return dailyFlagsRepository.save(flagsForToday);
+		}
+		
 		
 	}
 }
