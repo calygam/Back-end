@@ -4,18 +4,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.calygam.back.dtos.LazyCommentsDTO;
 import com.calygam.back.dtos.SendMessageDTO;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.MessageActivityEntity;
-
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.repositories.ActivityRepository;
-
 import com.calygam.back.repositories.MessageActivityRepository;
 import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.UsersRepository;
@@ -93,7 +95,23 @@ public class MessageActivityService {
 		
 	}
 	
+	//CAIO<- CRIANDO UM CARREGAMENTO LAZY PARA NÃO PESAR MUITO
+		public Page<LazyCommentsDTO> getLazyCommentsByActivity(Long activityId,Long lastMsgId,Pageable pageable){
+			Page<LazyCommentsDTO> transformData = messageActivityRepository.findLazyComments(activityId, lastMsgId, pageable);
+			transformData.forEach(comment->{
+				if(comment.getArchiveName()!=null) {
+					comment.setUserImageUrl(
+							ServletUriComponentsBuilder
+							.fromCurrentContextPath()
+							.path("/file/read/user/")
+							.path(comment.getArchiveName())
+							.toUriString()
+							);
+				}
+			});
+			return transformData;
 	
+		}
 
 	
 }

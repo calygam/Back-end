@@ -27,9 +27,6 @@ public class RegisterDTO {
     private String userPassword;
 
 
-    @NotBlank(message = "CPF não pode estar vazio!")
-    @CPF(message = "CPF inválido!")
-    private String userCpf;
     
 	private Long userMoney;
 	private UserRankEnum userRank;
@@ -46,14 +43,13 @@ public class RegisterDTO {
 	public RegisterDTO(Long id, @NotBlank(message = "Nome não pode estar vazio!") String userName,
 			@NotBlank(message = "Email não pode estar vazio!") @Email(message = "Email inválido!") String userEmail,
 			@NotBlank(message = "Senha não pode estar vazia!") String userPassword,
-			@NotBlank(message = "CPF não pode estar vazio!") @CPF(message = "CPF inválido!") String userCpf,
 			Long userMoney, UserRankEnum userRank, UserRoleEnum userRole) {
 		super();
 		this.id = id;
 		this.userName = userName;
 		this.userEmail = userEmail;
 		this.userPassword = userPassword;
-		this.userCpf = userCpf;
+
 		this.userMoney = userMoney;
 		this.userRank = userRank;
 		this.userRole = userRole;
@@ -66,7 +62,6 @@ public class RegisterDTO {
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();
 		userPassword = entity.getPassword();
-		userCpf = entity.getUserCpf();
 		userMoney = entity.getUserMoney();
 		userRank = entity.getUserRank();
 		userRole = entity.getUserRole();
@@ -106,12 +101,7 @@ public class RegisterDTO {
 		this.userPassword = userPassword;
 	}
 
-	public String getUserCpf() {
-		return userCpf;
-	}
-	public void setUserCpf(String userCpf) {
-		this.userCpf = userCpf;
-	}
+
 	public Long getUserMoney() {
 		return userMoney;
 	}
@@ -130,6 +120,8 @@ public class RegisterDTO {
 	public void setUserRole(UserRoleEnum userRole) {
 		this.userRole = userRole;
 	}
+	
+	
 	
 	
 

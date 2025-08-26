@@ -184,7 +184,7 @@ public class PetService {
 			controlRepository.save(controlApprenticePetEntity);
 			return new ApiSucessHandler<String>(true, "Pet ganhou energia!", null);
 		}else if(userEntity.getUserFood()>=baseFraction && controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy())  {
-			if(baseFraction<=userEntity.getUserFood() && baseFraction + controlApprenticePetEntity.getApprenticePetEnergy() < petEntity.getPetMaxEnergy()) {
+			if(baseFraction<=userEntity.getUserFood()) {
 				Long plusEnergy = controlApprenticePetEntity.getApprenticePetEnergy()+baseFraction;
 				if(plusEnergy> petEntity.getPetMaxEnergy()) {
 					Long  remainingAmountNecessary = petEntity.getPetMaxEnergy() - controlApprenticePetEntity.getApprenticePetEnergy();

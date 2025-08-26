@@ -9,5 +9,5 @@ import com.calygam.back.models.UserEntity;
 @Repository
 public interface UserAuthRepository extends JpaRepository<UserEntity, Long> {
 	UserEntity findByUserEmail(String userEmail);
-	UserEntity findByUserCpf(String userCpf);
+
 }

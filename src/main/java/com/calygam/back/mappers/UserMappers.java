@@ -16,7 +16,7 @@ public class UserMappers {
 		dataUtilUserDTO.setUserId(p.getUserId());
 		dataUtilUserDTO.setUserName(p.getUserName());
 		dataUtilUserDTO.setUserEmail(p.getUserEmail());
-		dataUtilUserDTO.setUserCpf(p.getUserCpf());
+	
 		dataUtilUserDTO.setUserXp(p.getXp());
 		dataUtilUserDTO.setUserImage(p.getUserImagePerfil());
 		UserRoleEnum roleTarget = UserRoleEnum.values()[p.getUserRole()];
@@ -38,7 +38,7 @@ public class UserMappers {
 		dataUtilUserDTO.setUserId(p.getUserId());
 		dataUtilUserDTO.setUserName(p.getUserName());
 		dataUtilUserDTO.setUserEmail(p.getUserEmail());
-		dataUtilUserDTO.setUserCpf(p.getUserCpf());
+
 		dataUtilUserDTO.setUserXp(p.getXp());
 		dataUtilUserDTO.setUserImage(
 				p.getUserImagePerfil()==null?null:

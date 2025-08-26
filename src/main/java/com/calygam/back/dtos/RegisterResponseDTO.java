@@ -12,7 +12,7 @@ import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 
 public class RegisterResponseDTO {
-	private Long id;
+private Long id;
 	
     @NotBlank(message = "Nome não pode estar vazio!")
     private String userName;
@@ -21,9 +21,6 @@ public class RegisterResponseDTO {
     @Email(message = "Email inválido!")
     private String userEmail;
 
-    @NotBlank(message = "CPF não pode estar vazio!")
-    @CPF(message = "CPF inválido!")
-    private String userCpf;
     
 
 	private String userRank;
@@ -34,13 +31,12 @@ public class RegisterResponseDTO {
 
 	public RegisterResponseDTO(Long id, @NotBlank(message = "Nome não pode estar vazio!") String userName,
 			@NotBlank(message = "Email não pode estar vazio!") @Email(message = "Email inválido!") String userEmail,
-			@NotBlank(message = "CPF não pode estar vazio!") @CPF(message = "CPF inválido!") String userCpf,
 			String userRank) {
 		super();
 		this.id = id;
 		this.userName = userName;
 		this.userEmail = userEmail;
-		this.userCpf = userCpf;
+
 		this.userRank = userRank;
 	}
 	
@@ -49,7 +45,7 @@ public class RegisterResponseDTO {
 		id = entity.getUserId();
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();
-		userCpf = entity.getUserCpf();
+
 		userRank = UserRankEnum.getRankForXpToString(xp);
 	}
 
@@ -77,13 +73,7 @@ public class RegisterResponseDTO {
 		this.userEmail = userEmail;
 	}
 
-	public String getUserCpf() {
-		return userCpf;
-	}
 
-	public void setUserCpf(String userCpf) {
-		this.userCpf = userCpf;
-	}
 
 	public String getUserRank() {
 		return userRank;
@@ -92,13 +82,4 @@ public class RegisterResponseDTO {
 	public void setUserRank(String userRank) {
 		this.userRank = userRank;
 	}
-
-
-	
-	
-	
-	
-	
-	
-
 }
