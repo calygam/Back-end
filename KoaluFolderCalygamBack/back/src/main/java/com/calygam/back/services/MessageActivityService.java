@@ -4,18 +4,20 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.calygam.back.dtos.LazyCommentsDTO;
 import com.calygam.back.dtos.SendMessageDTO;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.SoftNotFoundException;
 import com.calygam.back.models.ActivityEntity;
 import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.MessageActivityEntity;
-
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.repositories.ActivityRepository;
-
 import com.calygam.back.repositories.MessageActivityRepository;
 import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.UsersRepository;
@@ -39,6 +41,7 @@ public class MessageActivityService {
 	private UsersRepository usersRepository;
 	
 	//caio<- e pode ter também alguem que mande mensagem para outra pessoa como resposta
+	
 
 	
 	public ApiSucessHandler<String> sendMessageOrFeedBack(SendMessageDTO messageDTO,Long userId,Long activityId,Long messageActivityId){
@@ -53,10 +56,10 @@ public class MessageActivityService {
 		MessageActivityEntity messageActivityEntity = new MessageActivityEntity();
 		
 		
-		if(messageDTO.getMessageUserMentionedEmail() !=null && activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId()) && messageActivityId==null) {
+		/*if(messageDTO.getMessageUserMentionedEmail() !=null && activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId()) && messageActivityId==null) {
 			UserEntity userByEmail = usersRepository.findEntityByEmail(messageDTO.getMessageUserMentionedEmail()).orElseThrow(()-> new SoftNotFoundException("usuario que recebe não encontrado!"));
 			messageActivityEntity.setRecipient(userByEmail);
-		}
+		}*/
 		
 		if(activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId())){
 			messageActivityEntity.setMessageUserOwner(true);
@@ -70,7 +73,7 @@ public class MessageActivityService {
 			List<MessageActivityEntity> messageLimmit =targetReplyToMessage.getReplies().stream().filter(targetMessage -> !targetMessage.getMessageUserOwner()).collect(Collectors.toList());
 			if(!activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId())){
 				System.out.println("array com tamanho = "+ messageLimmit.size());
-				if(messageLimmit.size()>=44) {
+				if(messageLimmit.size()>=50) {
 					throw new ExcededMaxDelimiter("Este usuário já recebeu muitas respostas nessa atividade!");
 				}
 			}
@@ -91,6 +94,23 @@ public class MessageActivityService {
 		return new ApiSucessHandler<String>(true,"mensagem enviada com sucesso!", null);
 		
 		
+	}
+	
+	//CAIO<- CRIANDO UM CARREGAMENTO LAZY PARA NÃO PESAR MUITO
+	public Page<LazyCommentsDTO> getLazyCommentsByActivity(Long activityId,Long lastMsgId,Pageable pageable){
+		Page<LazyCommentsDTO> transformData = messageActivityRepository.findLazyComments(activityId, lastMsgId, pageable);
+		transformData.forEach(comment->{
+			if(comment.getArchiveName()!=null) {
+				comment.setUserImageUrl(
+						ServletUriComponentsBuilder
+						.fromCurrentContextPath()
+						.path("/file/read/user/")
+						.path(comment.getArchiveName())
+						.toUriString()
+						);
+			}
+		});
+		return transformData;
 	}
 	
 	

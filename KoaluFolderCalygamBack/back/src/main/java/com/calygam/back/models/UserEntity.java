@@ -65,9 +65,7 @@ public class UserEntity implements UserDetails,GenericFileManagement {
 	
 
 	
-	@Column(name="user_cpf",nullable=true)
-	@CPF(message="calygam<- CPF inválido")
-	private String userCpf;
+
 	
 	@Column(name="user_money")
 	private Long userMoney;
@@ -184,8 +182,7 @@ public class UserEntity implements UserDetails,GenericFileManagement {
 	}
 	public UserEntity(Long userId, String userProviderId, String userName,
 			@NotBlank(message = "Email Vázio não aceito!") @Email(message = "caligam<- Email Inválido!") String userEmail,
-			String userPassword, String archiveName, String originalName, String archivePath, String archiveType,
-			@CPF(message = "calygam<- CPF inválido") String userCpf, Long userMoney, Long userFood, Long xp,
+			String userPassword, String archiveName, String originalName, String archivePath, String archiveType, Long userMoney, Long userFood, Long xp,
 			UserRankEnum userRank, UserRoleEnum userRole, UserStatus userStatus, List<TrailEntity> trails,
 			List<ActivityProgressEntity> progress, List<ApprenticeInventoryEntity> items,
 			List<ControlApprenticePetEntity> pets, List<DailyFlagsEntity> flags, List<MessageActivityEntity> messages,
@@ -200,7 +197,6 @@ public class UserEntity implements UserDetails,GenericFileManagement {
 		this.originalName = originalName;
 		this.archivePath = archivePath;
 		this.archiveType = archiveType;
-		this.userCpf = userCpf;
 		this.userMoney = userMoney;
 		this.userFood = userFood;
 		this.xp = xp;
@@ -267,13 +263,7 @@ public class UserEntity implements UserDetails,GenericFileManagement {
 	public void setUserPassword(String userPassword) {
 		this.userPassword = userPassword;
 	}
-	public String getUserCpf() {
-		return userCpf;
-	}
 
-	public void setUserCpf(String userCpf) {
-		this.userCpf = userCpf;
-	}
 
 	public Long getXp() {
 		return xp;

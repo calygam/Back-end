@@ -116,14 +116,12 @@ public ApiSucessHandler<String> EditCredentialsUser(Long userId,EditCredentialsD
 		if(userAuthRepository.findByUserEmail(registerDTO.getUserEmail())!=null) {
 			throw new UserAlreadExistsException("Usuário já existe na base -> E-mail!");
 		}
-		if(userAuthRepository.findByUserCpf(registerDTO.getUserCpf())!=null) {
-			throw new UserAlreadExistsException("Usuário já existe na base -> CPF!");
-		}
+	
 		UserEntity userEntity = new UserEntity();
 		
 		userEntity.setUserName(registerDTO.getUserName());
 		userEntity.setUserEmail(registerDTO.getUserEmail());
-		userEntity.setUserCpf(registerDTO.getUserCpf());
+
 		userEntity.setUserMoney(0L);
 		userEntity.setUserStatus(UserStatus.ACTIVE);
 		Long xp = 0L;
@@ -137,7 +135,7 @@ public ApiSucessHandler<String> EditCredentialsUser(Long userId,EditCredentialsD
 		RegisterResponseDTO userResponseDTO = new RegisterResponseDTO();
 		userResponseDTO.setId(userEntity.getUserId());
 		userResponseDTO.setUserName(userEntity.getUsername());
-		userResponseDTO.setUserCpf(userEntity.getUserCpf());
+	
 		userResponseDTO.setUserEmail(userEntity.getUserEmail());
 	    String userRank = UserRankEnum.getRankForXpToString(userEntity.getXp());
 	    userResponseDTO.setUserRank(userRank);

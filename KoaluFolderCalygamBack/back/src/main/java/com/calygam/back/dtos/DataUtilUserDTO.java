@@ -16,8 +16,7 @@ public class DataUtilUserDTO {
 	private Long userId;
 	private String userName;
 	private String userEmail;
-	@JsonInclude(JsonInclude.Include.NON_NULL)
-	private String userCpf;
+
 	private Long userXp;
 	private String userRank;	
 	private Integer userRankPoints;
@@ -43,7 +42,7 @@ public class DataUtilUserDTO {
 	    }
 	}
 	
-	public DataUtilUserDTO(Long userId, String userName, String userEmail,String archiveName, String userCpf, Long userXp,
+	public DataUtilUserDTO(Long userId, String userName, String userEmail,String archiveName, Long userXp,
 			 UserRoleEnum userRole, Long userMoney) {
 		super();
 		this.userId = userId;
@@ -51,7 +50,6 @@ public class DataUtilUserDTO {
 		this.userEmail = userEmail;
 		this.userImage = archiveName; 
 		
-		this.userCpf = userCpf;
 		this.userXp = userXp;
 		this.userRank = UserRankEnum.getRankForXpToString(userXp);
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
@@ -70,7 +68,6 @@ public class DataUtilUserDTO {
 		userId = entity.getUserId();
 		userName = entity.getUserName();
 		userEmail = entity.getUserEmail();
-		userCpf = entity.getUserCpf();
 		userXp = entity.getXp();
 		this.userRank = UserRankEnum.getRankForXpToString(userXp);
 		this.userRankPoints =UserRankEnum.getRankForXpPoints(userXp);
@@ -101,12 +98,7 @@ public class DataUtilUserDTO {
 	public void setUserEmail(String userEmail) {
 		this.userEmail = userEmail;
 	}
-	public String getUserCpf() {
-		return userCpf;
-	}
-	public void setUserCpf(String userCpf) {
-		this.userCpf = userCpf;
-	}
+
 	public Long getUserXp() {
 		return userXp;
 	}
