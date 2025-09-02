@@ -50,6 +50,10 @@ public class MessageActivityEntity {
 
 	@OneToMany(mappedBy = "replyTo", cascade = CascadeType.ALL, orphanRemoval = true)
 	private List<MessageActivityEntity> replies = new ArrayList<>();
+	@Column(name="messages_size")
+	private Long messageSize;
+	@Column(name="messages_res_size")
+	private Long messageResSize;
 	
 	
 
@@ -65,7 +69,7 @@ public class MessageActivityEntity {
 	public MessageActivityEntity(Long messageActivityId, String messageActivityDescription,
 			MessageActivityTypeEnum messageActivityType, Boolean messageActivityIsPrivate, Boolean messageUserOwner,
 			UserEntity user, UserEntity recipient, ActivityEntity activity, MessageActivityEntity replyTo,
-			List<MessageActivityEntity> replies) {
+			List<MessageActivityEntity> replies,Long messageSize,Long messageResSize) {
 		super();
 		this.messageActivityId = messageActivityId;
 		this.messageActivityDescription = messageActivityDescription;
@@ -77,6 +81,8 @@ public class MessageActivityEntity {
 		this.activity = activity;
 		this.replyTo = replyTo;
 		this.replies = replies;
+		this.messageSize = messageSize;
+		this.messageResSize = messageResSize;
 	}
 
 
@@ -199,6 +205,42 @@ public class MessageActivityEntity {
 
 	public void setReplies(List<MessageActivityEntity> replies) {
 		this.replies = replies;
+	}
+
+
+
+
+
+
+	public Long getMessageSize() {
+		return messageSize;
+	}
+
+
+
+
+
+
+	public void setMessageSize(Long messageSize) {
+		this.messageSize = messageSize;
+	}
+
+
+
+
+
+
+	public Long getMessageResSize() {
+		return messageResSize;
+	}
+
+
+
+
+
+
+	public void setMessageResSize(Long messageResSize) {
+		this.messageResSize = messageResSize;
 	}
 	
 	

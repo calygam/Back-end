@@ -9,6 +9,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
+import com.calygam.back.dtos.CommentNextDTO;
 import com.calygam.back.dtos.LazyCommentsDTO;
 import com.calygam.back.dtos.SendMessageDTO;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
@@ -24,6 +25,7 @@ import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.sucesshandlers.ApiSucessHandler;
 
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.transaction.Transactional;
 
 @Service
 public class MessageActivityService {
@@ -58,6 +60,10 @@ public class MessageActivityService {
 		if(messageDTO.getMessageUserMentionedEmail() !=null && activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId()) && messageActivityId==null) {
 			UserEntity userByEmail = usersRepository.findEntityByEmail(messageDTO.getMessageUserMentionedEmail()).orElseThrow(()-> new SoftNotFoundException("usuario que recebe não encontrado!"));
 			messageActivityEntity.setRecipient(userByEmail);
+		}else {
+			Long targetCountComments = (long) messageActivityRepository.findAllByActivity_activityIdAndReplyToIsNull(activityId).size();
+			
+			messageActivityEntity.setMessageSize(targetCountComments+1);
 		}
 		
 		if(activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId())){
@@ -70,12 +76,12 @@ public class MessageActivityService {
 			MessageActivityEntity targetReplyToMessage = messageActivityRepository.findById(messageActivityId).orElseThrow(()-> new SoftNotFoundException("mensagem não encontrada para responder!"));
 			
 			List<MessageActivityEntity> messageLimmit =targetReplyToMessage.getReplies().stream().filter(targetMessage -> !targetMessage.getMessageUserOwner()).collect(Collectors.toList());
-			if(!activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId())){
+			/*if(!activityEntity.getTrail().getUser().getUserId().equals(userRequestMassageEntity.getUserId())){
 				System.out.println("array com tamanho = "+ messageLimmit.size());
 				if(messageLimmit.size()>=44) {
 					throw new ExcededMaxDelimiter("Este usuário já recebeu muitas respostas nessa atividade!");
 				}
-			}
+			}*/
 			
 
 			messageActivityEntity.setReplyTo(targetReplyToMessage);
@@ -96,22 +102,86 @@ public class MessageActivityService {
 	}
 	
 	//CAIO<- CRIANDO UM CARREGAMENTO LAZY PARA NÃO PESAR MUITO
-		public Page<LazyCommentsDTO> getLazyCommentsByActivity(Long activityId,Long lastMsgId,Pageable pageable){
+		public CommentNextDTO<LazyCommentsDTO> getLazyCommentsByActivity(Long activityId,Long lastMsgId,Pageable pageable){
 			Page<LazyCommentsDTO> transformData = messageActivityRepository.findLazyComments(activityId, lastMsgId, pageable);
 			transformData.forEach(comment->{
-				if(comment.getArchiveName()!=null) {
+				if(comment.getArchiveName()!=null && !comment.getArchiveName().isEmpty() ) {
 					comment.setUserImageUrl(
+							
 							ServletUriComponentsBuilder
 							.fromCurrentContextPath()
 							.path("/file/read/user/")
 							.path(comment.getArchiveName())
 							.toUriString()
 							);
-				}
+				}else {comment.setUserImageUrl(null);}
 			});
-			return transformData;
-	
+			return new CommentNextDTO<>(transformData.getContent(),transformData.hasNext());
+
 		}
+		
+		public CommentNextDTO<LazyCommentsDTO> getLazyCommentsByActivityResponse(Long messageActivityId,  Long activityId,Long lastMsgId,Pageable pageable){
+			Page<LazyCommentsDTO> transformData = messageActivityRepository.findLazyCommentsResponse(messageActivityId,activityId, lastMsgId, pageable);
+			transformData.forEach(comment->{
+				
+				if(comment.getArchiveName()!=null && !comment.getArchiveName().isEmpty() ) {
+					comment.setUserImageUrl(
+							
+							ServletUriComponentsBuilder
+							.fromCurrentContextPath()
+							.path("/file/read/user/")
+							.path(comment.getArchiveName())
+							.toUriString()
+							);
+				}else {
+comment.setUserImageUrl(null);
+
+				}
+	
+				
+			});
+			
+			return new CommentNextDTO<>(transformData.getContent(),transformData.hasNext());
+		}
+		
+		@Transactional
+		public ApiSucessHandler<String> deleteOneComment(Long messageActivityId,Long activityId,Long userId){
+			if(!usersRepository.existsById(userId)) {
+				throw new SoftNotFoundException("Usuário não encontrado");
+			}
+			
+			if(!activityRepository.existsById(activityId)) {
+				throw new SoftNotFoundException("Atividade não encontrada");
+			}
+			MessageActivityEntity messageActivityEntity = messageActivityRepository.findById(messageActivityId).orElseThrow(()-> new SoftNotFoundException("Mensagem não encontrada"));
+			
+			if(messageActivityEntity.getUser().getUserId().equals(userId)) {
+				messageActivityRepository.delete(messageActivityEntity);
+				}else {
+					throw new SoftNotFoundException("usuário não identificado!");
+				}
+			
+			return new ApiSucessHandler<String>(true, "Mensagem deletada com sucesso!", null);
+			
+		}
+		
+		public ApiSucessHandler<String> editOneComment(SendMessageDTO messageDTO,Long messageActivityId,Long activityId,Long userId){
+			if(!usersRepository.existsById(userId)) {
+				throw new SoftNotFoundException("Usuário não encontrado");
+			}
+			
+			if(!activityRepository.existsById(activityId)) {
+				throw new SoftNotFoundException("Atividade não encontrada");
+			}
+			MessageActivityEntity messageActivityEntity = messageActivityRepository.findById(messageActivityId).orElseThrow(()-> new SoftNotFoundException("Mensagem não encontrada"));
+		
+			
+			return new ApiSucessHandler<String>(true, "Mensagem deletada com sucesso!", null);
+			
+		}
+		
+		
+		
 
 	
 }
