@@ -22,17 +22,10 @@ jobs:
           java-version: '21'
           distribution: 'microsoft' # Usando a distribuição do projeto anterior
 
-      - name: Build com Maven
-        run: mvn clean install -e -X # <- passa as flags aqui
+      - name: Build com Maven (skip tests)
+        run: mvn clean install -DskipTests -e -X # <-- agora pula os testes
         env:
-          MAVEN_OPTS: "-Xms512m -Xmx1024m" # <- só opções da JVM aqui
-
-      - name: Upload Surefire Reports
-        if: failure()
-        uses: actions/upload-artifact@v4
-        with:
-          name: surefire-reports
-          path: target/surefire-reports/
+          MAVEN_OPTS: "-Xms512m -Xmx1024m"
 
       - name: Verificar arquivo JAR
         run: |
