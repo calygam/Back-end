@@ -165,7 +165,7 @@ comment.setUserImageUrl(null);
 			
 		}
 		
-		public ApiSucessHandler<String> editOneComment(SendMessageDTO messageDTO,Long messageActivityId,Long activityId,Long userId){
+		public CommentNextDTO<LazyCommentsDTO> editOneComment(SendMessageDTO messageDTO,Long messageActivityId,Long activityId,Long userId,Boolean msgResponse,Long lastMsgId,Pageable pageable){
 			if(!usersRepository.existsById(userId)) {
 				throw new SoftNotFoundException("Usuário não encontrado");
 			}
@@ -174,9 +174,23 @@ comment.setUserImageUrl(null);
 				throw new SoftNotFoundException("Atividade não encontrada");
 			}
 			MessageActivityEntity messageActivityEntity = messageActivityRepository.findById(messageActivityId).orElseThrow(()-> new SoftNotFoundException("Mensagem não encontrada"));
-		
 			
-			return new ApiSucessHandler<String>(true, "Mensagem deletada com sucesso!", null);
+			messageActivityEntity.setMessageActivityDescription(messageDTO.getMessageActivityDescription());
+			messageActivityRepository.save(messageActivityEntity);
+			Page<LazyCommentsDTO> transformData = !msgResponse?messageActivityRepository.findLazyComments(activityId, lastMsgId, pageable):messageActivityRepository.findLazyCommentsResponse(messageActivityEntity.getReplyTo().getMessageActivityId(),activityId, lastMsgId, pageable);
+			transformData.forEach(comment->{
+				if(comment.getArchiveName()!=null && !comment.getArchiveName().isEmpty() ) {
+					comment.setUserImageUrl(
+							
+							ServletUriComponentsBuilder
+							.fromCurrentContextPath()
+							.path("/file/read/user/")
+							.path(comment.getArchiveName())
+							.toUriString()
+							);
+				}else {comment.setUserImageUrl(null);}
+			});
+			return new CommentNextDTO<>(transformData.getContent(),transformData.hasNext());
 			
 		}
 		

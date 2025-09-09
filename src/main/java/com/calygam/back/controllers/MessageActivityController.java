@@ -1,12 +1,12 @@
 package com.calygam.back.controllers;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestHeader;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,6 +61,21 @@ public class MessageActivityController {
 			token = token.replace("Bearer ","");
 			Long userId = jwtUtilsId.getUserIdFromToken(token);
 			return messageActivityService.deleteOneComment(messageActivityId, activityId, userId);
+		}
+		//http://localhost:8080/message/activity/update/43?activityId=43&lastMsgId=0&msgResponse=false
+		@PutMapping("/update/{messageActivityId}")
+		public CommentNextDTO<LazyCommentsDTO> editOneComment(
+				@RequestBody SendMessageDTO messageDTO,
+				@RequestHeader("Authorization") String token,
+				@PathVariable Long messageActivityId,
+				@RequestParam Long activityId,
+				@RequestParam(required=false) Long lastMsgId,
+				@RequestParam Boolean msgResponse,
+				Pageable pageable){
+			token = token.replace("Bearer ","");
+			Long userId = jwtUtilsId.getUserIdFromToken(token);
+			return messageActivityService.editOneComment(messageDTO, messageActivityId, activityId, userId, msgResponse, lastMsgId, pageable);
+			
 		}
 	
 }
