@@ -58,7 +58,7 @@ public class SubmissionService {
 	@Transactional
 	public Boolean deleteSubmission(Long submissionId,Long progressId) {
 	     Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressId);
-	     if(submissionId<2) {
+	     if(submissionCount<2) {
 	    	 throw new ExcededMaxDelimiter("*Ops!, Deve existir pelo menos um arquivo entregue!");
 	     }
 		SubmissionEntity submissionEntity = submissionsRepository.findById(submissionId)
