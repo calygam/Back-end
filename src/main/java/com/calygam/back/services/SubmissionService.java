@@ -8,10 +8,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.calygam.back.dtos.ProgressSubmitActivityDTO;
+import com.calygam.back.dtos.SubmissionsDTO;
+import com.calygam.back.dtos.SubmittedActivityUserDTO;
 import com.calygam.back.exceptions.ExcededMaxDelimiter;
 import com.calygam.back.exceptions.SoftNotFoundException;
+import com.calygam.back.exceptions.UnauthorizedAcessUserException;
 import com.calygam.back.mappers.SubmissionMappers;
+import com.calygam.back.models.ActivityEntity;
+import com.calygam.back.models.ActivityProgressEntity;
 import com.calygam.back.models.SubmissionEntity;
+import com.calygam.back.projections.SubmissionArchivesForTeacherProjection;
 import com.calygam.back.repositories.ActivityRepository;
 import com.calygam.back.repositories.ProgressRepository;
 import com.calygam.back.repositories.SubmissionsRepository;
@@ -55,6 +61,25 @@ public class SubmissionService {
 				.collect(Collectors.toList());
 	}
 	
+	public List<SubmittedActivityUserDTO> ListenerSubmittedArchivesUser(Long userId, Long progressId) {
+		ActivityProgressEntity ac = progressRepository.findById(progressId).orElseThrow(()-> new SoftNotFoundException("Usuário não encontrado"));
+		ActivityEntity atv = activityRepository.findById(ac.getActivity().getActivityId()).orElseThrow(()-> new SoftNotFoundException("Usuário não encontrado"));
+		
+		
+        return submissionsRepository.findArchivesForDownloadAcessPerProgressIdAndPhoto(atv.getActivityId()!=null?atv.getActivityId():0L)
+                .stream()
+                .collect(Collectors.groupingBy(p->p.getUserId()))
+                .entrySet()
+                .stream()
+                .map(entry -> {
+                    List<SubmissionArchivesForTeacherProjection> groupList = entry.getValue();
+                    List<SubmissionsDTO> submissions = groupList.stream()
+                            .map(mapper::transferToSubmissionDTO)
+                            .collect(Collectors.toList());
+                    return mapper.deliveredToDTO(groupList.get(0), submissions);
+                })
+                .collect(Collectors.toList());
+    }
 	@Transactional
 	public Boolean deleteSubmission(Long submissionId,Long progressId) {
 	     Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressId);

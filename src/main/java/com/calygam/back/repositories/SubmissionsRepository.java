@@ -8,6 +8,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 
 import com.calygam.back.models.SubmissionEntity;
+import com.calygam.back.projections.SubmissionArchivesForTeacherProjection;
 import com.calygam.back.projections.SubmissionArchivesProjection;
 
 public interface SubmissionsRepository extends JpaRepository<SubmissionEntity, Long> {
@@ -22,7 +23,38 @@ public interface SubmissionsRepository extends JpaRepository<SubmissionEntity, L
 	        WHERE tbs.progress_id = :progressId
 	        """, nativeQuery = true)
 	List<SubmissionArchivesProjection> findArchivesForDownloadAcessPerProgressId(@Param("progressId") Long progressId);
+	/*@Query("""
+		    SELECT 
+		        tbs.archiveName AS submissionArchiveName,
+		        tbs.originalName AS submissionOriginalName,
+		        tbs.submissionId AS submissionId,
+		        tbpu.userName AS userName,
+		        tbpu.archiveName AS userArchiveName
+		    FROM SubmissionEntity tbs
+		    JOIN tbs.progress tbp
+		    JOIN tbp.user tbpu
+		    WHERE tbp.id = :progressId
+		    """)
+		List<SubmissionArchivesForTeacherProjection> findArchivesForDownloadAcessPerProgressIdAndPhoto(
+		    @Param("progressId") Long progressId
+		);*/
 	
+	@Query("""
+		    SELECT 
+		        tbs.archiveName AS submissionArchiveName,
+		        tbs.originalName AS submissionOriginalName,
+		        tbs.submissionId AS submissionId,
+		        tbpu.userId AS userId,
+		        tbpu.userName AS userName,
+		        tbpu.archiveName AS userArchiveName
+		    FROM SubmissionEntity tbs
+		    JOIN tbs.progress tbp
+		    JOIN tbp.user tbpu
+		    WHERE tbp.activity.activityId = :activityId
+		    """)
+		List<SubmissionArchivesForTeacherProjection> findArchivesForDownloadAcessPerProgressIdAndPhoto(
+		    @Param("activityId") Long activityId
+		);
 	@Query(value="""
 			
 			SELECT * FROM tb_submission s WHERE s.progress_id = :progressId""",nativeQuery=true)
