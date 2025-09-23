@@ -21,6 +21,7 @@ import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.services.GoogleAuthService;
 import com.calygam.back.services.TokenService;
 import com.calygam.back.services.UsersServices;
+import jakarta.servlet.http.HttpServletRequest;
 
 import jakarta.servlet.http.HttpServletResponse;
 
@@ -47,6 +48,9 @@ public class GoogleOauthController {
 	
 	@Value("${frontend.url}")
 	private String frontendUrl;
+
+	@Value("${frontend.mobile.url}")
+	private String frontendMobileUrl;
 	
 	@GetMapping("/google")
 	public ResponseEntity<Void> goToGoogle(HttpServletResponse response) throws IOException {
@@ -62,7 +66,7 @@ public class GoogleOauthController {
 	}
 	
 	@GetMapping("google/callback")
-	public ResponseEntity<Void> goToGoogleResponse(@RequestParam("code") String code, HttpServletResponse response) throws GoogleAuthException {
+	public ResponseEntity<Void> goToGoogleResponse(@RequestParam("code") String code,HttpServletRequest request, HttpServletResponse response) throws GoogleAuthException {
 		try {
 			// Obter token de acesso do Google
 			GoogleTokenResponseDTO tokenResponse = googleAuthService.extractTokenForCode(code);
@@ -97,13 +101,30 @@ public class GoogleOauthController {
 			
 			// Gerar token JWT
 			String jwtToken = tokenService.generateToken(user);
+			String userAgent = request.getHeader("User-Agent");
+			String redirectUrl;
+
+			if(isMobile(userAgent)){
+				redirectUrl = frontendMobileUrl + "/home?token=" + jwtToken;
+			}else{
+				redirectUrl = frontendUrl + "/home?token=" + jwtToken;
+			}
 			
 			// Redirecionar para o frontend com o token
-			response.sendRedirect(frontendUrl + "/home?token=" + jwtToken);
+			response.sendRedirect(redirectUrl);
 			return ResponseEntity.ok().build();
 			
 		} catch (Exception e) {
 			throw new GoogleAuthException("Erro durante o processo de autenticação com Google", e);
 		}
 	}
+	private boolean isMobile(String userAgent) {
+    return userAgent != null && (
+        userAgent.contains("Mobi") || 
+        userAgent.contains("Android") || 
+        userAgent.contains("iPhone") ||
+        userAgent.contains("iPad") ||
+        userAgent.contains("Windows Phone"));
 }
+}
+
