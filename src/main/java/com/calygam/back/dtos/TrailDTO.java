@@ -25,6 +25,7 @@ public class TrailDTO {
 	private Long trailVacancy;
 	private Long trailVacancies;
 	private Long user;
+	private Boolean trailHavePassword;
 	
 	private List<ActivityDTO> activities = new ArrayList<>();
 	private String calygamCode;
@@ -143,7 +144,7 @@ public class TrailDTO {
 	
 		trailCreatedDate = entity.getTrailCreatedDate();
 		trailUpdatedDate = entity.getTrailUpdatedDate();
-		
+		//
 		trailVacancy = entity.getTrailVacancy();
 		trailVacancies = entity.getTrailVacancies();
 		user = entity.getUser().getUserId();
@@ -155,6 +156,7 @@ public class TrailDTO {
 		this.activities = entity.getActivities().stream()
 		        .map(ActivityDTO::new) 
 		        .collect(Collectors.toList());
+		this.trailHavePassword =trailPassword==null || trailPassword==""? false:true;
 		
 	}
 	//.s

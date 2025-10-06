@@ -68,6 +68,8 @@ public class TrailEntity implements GenericFileManagement {
 	@Column(name="trail_archive_type")
 	private String archiveType;
 	
+	
+	
 	@OneToMany(mappedBy="trail",cascade = CascadeType.ALL, orphanRemoval = true)
 	@OrderBy("activityId ASC")
 	private List<ActivityEntity> activities = new ArrayList<>();
