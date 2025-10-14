@@ -63,5 +63,7 @@ public interface TrailRepository extends JpaRepository<TrailEntity, Long> {
     
     Optional<TrailEntity> findById(Long trailId);
     
+    Optional<TrailEntity> findByTrailPassword(String trailPassword);
+    
     
 }

@@ -144,6 +144,7 @@ public class TrailDTO {
 	
 		trailCreatedDate = entity.getTrailCreatedDate();
 		trailUpdatedDate = entity.getTrailUpdatedDate();
+		
 		//
 		trailVacancy = entity.getTrailVacancy();
 		trailVacancies = entity.getTrailVacancies();
@@ -156,6 +157,7 @@ public class TrailDTO {
 		this.activities = entity.getActivities().stream()
 		        .map(ActivityDTO::new) 
 		        .collect(Collectors.toList());
+		this.trailPassword = entity.getTrailPassword();
 		this.trailHavePassword =trailPassword==null || trailPassword==""? false:true;
 		
 	}
@@ -183,6 +185,8 @@ public class TrailDTO {
 		        .map(ActivityDTO::new) 
 		        .collect(Collectors.toList());
 		this.progressBarTrailDTO = prog;
+		this.trailPassword = entity.getTrailPassword();
+		this.trailHavePassword =trailPassword==null || trailPassword==""? false:true;
 		
 	}
 	

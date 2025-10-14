@@ -11,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.stereotype.Repository;
 
 import com.calygam.back.dtos.DataUtilUserDTO;
+import com.calygam.back.models.TrailEntity;
 import com.calygam.back.models.UserEntity;
 import com.calygam.back.projections.AdminAnalisisProjection;
 import com.calygam.back.projections.TeacherDashProjection;
@@ -60,6 +61,8 @@ public interface UsersRepository extends JpaRepository<UserEntity,Long> {
     	countQuery = "SELECT COUNT(*) FROM tb_users WHERE user_role = 2",
     	nativeQuery = true)
     	Page<TeacherDashProjection> findTeachersByRole(Pageable pageable);
+    
+   
     
   
 	

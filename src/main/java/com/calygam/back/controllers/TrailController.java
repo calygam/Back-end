@@ -14,6 +14,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.calygam.back.dtos.SecurePasswordDTO;
 import com.calygam.back.dtos.TrailDTO;
 import com.calygam.back.services.JwtUtilsId;
 import com.calygam.back.services.TrailService;
@@ -62,5 +63,10 @@ public class TrailController {
 		System.out.println("Entreeeeeeeeeeei");
 		Long userId = jwtUtilsId.getUserIdFromToken(token);
 		return trailService.updateInfoTrailByExistsId(userId, trailId,trailDTO);
+	}
+	
+	@GetMapping("/gen/password")
+	public SecurePasswordDTO generateSecureRandomPasswordCtrl() {
+		return trailService.generateSecurePasswordService();
 	}
 }

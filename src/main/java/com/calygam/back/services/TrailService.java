@@ -14,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import com.calygam.back.dtos.ActivityDTO;
 import com.calygam.back.dtos.ProgressBarTrailDTO;
+import com.calygam.back.dtos.SecurePasswordDTO;
 import com.calygam.back.dtos.TrailDTO;
 import com.calygam.back.enums.StatusOfLife;
 import com.calygam.back.exceptions.SoftNotFoundException;
@@ -29,6 +30,7 @@ import com.calygam.back.repositories.RewardRepository;
 import com.calygam.back.repositories.TrailRepository;
 import com.calygam.back.repositories.UsersRepository;
 import com.calygam.back.utils.MakeUploadAndDownloadArchive;
+import com.calygam.back.utils.SecureRandomPassword;
 
 import jakarta.persistence.EntityNotFoundException;
 
@@ -50,8 +52,11 @@ public class TrailService {
 	@Autowired
 	private ActivityProgressMapper activityProgressMapper;
 	
+	@Autowired
+	private SecureRandomPassword secureRandomPassword;
+	
 	public TrailDTO createNewTrail(Long userId,TrailDTO trailDTO) throws IOException {
-		
+	 
 		if(trailRepository.findExistentTrail(trailDTO.getTrailName())!=null) {
 			throw new UserAlreadExistsException("Está trilha já foi registrada");
 		}
@@ -65,9 +70,11 @@ public class TrailService {
 		trailEntity.setTrailUpdatedDate(null);
 		
 	
-		trailEntity.setTrailPassword(	
+		/*trailEntity.setTrailPassword(	
 				trailDTO.getTrailPassword()!=null?
-						new BCryptPasswordEncoder().encode(trailDTO.getTrailPassword()):null);
+						new BCryptPasswordEncoder().encode(trailDTO.getTrailPassword()):null);*/
+		
+		trailEntity.setTrailPassword(trailDTO.getTrailPassword());
 		trailEntity.setTrailVacancy(Long.valueOf(0));
 		trailEntity.setTrailVacancies(trailDTO.getTrailVacancies());
 		
@@ -304,5 +311,20 @@ public class TrailService {
 	        }
 	        trailRepository.delete(trail);
 	    }
+	    
+	    public SecurePasswordDTO generateSecurePasswordService() {
+	    	SecurePasswordDTO securePasswordDTO = new SecurePasswordDTO();
+	    	String secureRandomPasswordCode = secureRandomPassword.GenerateSecureRandomPassword(8);
+	    	TrailEntity trail = trailRepository.findByTrailPassword(secureRandomPasswordCode).orElse(null);
+	    	while (trail !=null) {
+	    		secureRandomPasswordCode = secureRandomPassword.GenerateSecureRandomPassword(8);
+		    	trail = trailRepository.findByTrailPassword(secureRandomPasswordCode).orElse(null);
+			}
+	    	
+	    	securePasswordDTO.setRandomSecurePassword(secureRandomPasswordCode);
+			return securePasswordDTO;
+		}
+
 	}
 
+	

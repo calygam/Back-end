@@ -138,8 +138,12 @@ public class ProgressActivityService {
 	    if(trailEntity.getTrailVacancy()>=trailEntity.getTrailVacancies()) {
 	    	throw new ExcededMaxDelimiter("Vagas excedidas!");
 	    }
+	    Boolean passwordValid = false;
+	    if(trailPassword!=null && trailPassword!="" && !trailEntity.getTrailPassword().isEmpty()) {
+	    		passwordValid = trailPassword.equals(trailEntity.getTrailPassword());
+	    }
 	    
-	    if(passwordEncoder.matches(trailPassword, trailEntity.getTrailPassword())) {
+	    if( passwordValid ||trailEntity.getTrailPassword()==null ||trailEntity.getTrailPassword()=="" || trailEntity.getTrailPassword().isEmpty()) {
 	    	 Boolean hasProgress = progressRepository
 	    	            .existsByUserIdAndTrailId(userId, trailId);
 	    	if(!hasProgress) {
