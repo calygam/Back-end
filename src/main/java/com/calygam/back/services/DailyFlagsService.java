@@ -35,7 +35,7 @@ public class DailyFlagsService {
 		DailyFlagsEntity flagsForToday = new DailyFlagsEntity();
 		flagsForToday.setUser(user);
 		flagsForToday.setDailyFlagCreatedAt(dailyFlagsRepository.getDatabaseCurrentTimeStamp());
-		flagsForToday.setUserFlags(4L);
+		flagsForToday.setUserFlags(12L);
 		return dailyFlagsRepository.save(flagsForToday);
 		}
 		

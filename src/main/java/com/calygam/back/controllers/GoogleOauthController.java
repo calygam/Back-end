@@ -103,12 +103,13 @@ public class GoogleOauthController {
 			String jwtToken = tokenService.generateToken(user);
 			String userAgent = request.getHeader("User-Agent");
 			String redirectUrl;
-
-			if(isMobile(userAgent)){
+			//isMobile(userAgent)
+			if(true){
 				redirectUrl = frontendMobileUrl + "/home?token=" + jwtToken;
-			}else{
-				redirectUrl = frontendUrl + "/home?token=" + jwtToken;
 			}
+			/*else{
+				redirectUrl = frontendUrl + "/home?token=" + jwtToken;
+			}*/
 			
 			// Redirecionar para o frontend com o token
 			response.sendRedirect(redirectUrl);
