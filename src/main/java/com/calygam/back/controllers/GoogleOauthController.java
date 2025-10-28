@@ -105,10 +105,11 @@ public class GoogleOauthController {
 			String redirectUrl;
 			//isMobile(userAgent)
 			if(true){
-				redirectUrl = frontendMobileUrl + "/home?token=" + jwtToken;
+				redirectUrl = frontendUrl + "/home?token=" + jwtToken;
+	
 			}
 			/*else{
-				redirectUrl = frontendUrl + "/home?token=" + jwtToken;
+					redirectUrl = frontendMobileUrl + "/home?token=" + jwtToken;
 			}*/
 			
 			// Redirecionar para o frontend com o token
