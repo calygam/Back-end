@@ -18,13 +18,16 @@ public class SubmissionMappers {
 	public ProgressSubmitActivityDTO submittedToDTO(SubmissionArchivesProjection p){
 		
 		ProgressSubmitActivityDTO progressSubmitActivityDTO = new ProgressSubmitActivityDTO();
+		if(p.getArchiveName()!=null) {
 		progressSubmitActivityDTO.setSubmissionId(p.getSubmissionId());
 		progressSubmitActivityDTO.setActivitySubmitedFile(ServletUriComponentsBuilder
 	                .fromCurrentContextPath()
 	                .path("/file/read/submission/")        
 	                .path(p.getArchiveName())
 	                .toUriString());
-		progressSubmitActivityDTO.setActivityOriginalFileName(p.getOriginalName());
+		progressSubmitActivityDTO.setActivityOriginalFileName(p.getOriginalName());}
+		
+		progressSubmitActivityDTO.setActivityLink(p.getSubmisionLink());
 		
 		return progressSubmitActivityDTO;
 		
@@ -34,8 +37,12 @@ public class SubmissionMappers {
 		SubmissionsDTO submissionsDTO = new SubmissionsDTO();
 		
 		submissionsDTO.setSubmissionId(p.getSubmissionId());
+		if(p.getSubmissionLink()!=null && !p.getSubmissionLink().isEmpty()) {
+			submissionsDTO.setSubmissionLink(p.getSubmissionLink());
+		}else {
 		submissionsDTO.setSubmissionArchiveUrl(buildUrlUtil("/file/read/submission/",p.getSubmissionArchiveName()));
 		submissionsDTO.setSubmissionOriginalName(p.getSubmissionOriginalName());
+		}
 		return submissionsDTO;
 	}
 	

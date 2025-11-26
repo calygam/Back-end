@@ -236,29 +236,43 @@ public class ProgressActivityService {
 	             .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado linha"));
  	     
 	      if(progressEntityCompleted.getActivityStatus() == StatusOfLife.COMPLETE && activityId>0) {
-	          // Verificar limite de 5 submissões
-
-
-		         if (dto.getActivityFiles() == null || dto.getActivityFiles().isEmpty()) {
-		             throw new IllegalArgumentException("Nenhum arquivo enviado!");
+		         if (dto.getActivityFiles() != null && !dto.getActivityFiles().isEmpty()) {
+		        	 dto.getActivityFiles().forEach(targetArchive -> {
+				         Long submissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNotNull(progressEntityCompleted.getProgressId());
+				         if (submissionCount >= 5) {
+				             throw new ExcededMaxDelimiter("Limite de 5 entregas atingido para esta atividade!");
+				         }
+			             SubmissionEntity submissionEntity = new SubmissionEntity();
+			             submissionEntity.setProgress(progressEntityCompleted);
+			             try {
+			                 makeUploadAndDownloadArchive.saveArchive(targetArchive, submissionEntity, submissionsRepository);
+			             } catch (IOException e) {
+			                 throw new RuntimeException("Erro ao salvar arquivo: " + targetArchive.getOriginalFilename());
+			             }
+			         });
 		         }
-		         dto.getActivityFiles().forEach(targetArchive -> {
-			         Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressEntityCompleted.getProgressId());
-			         if (submissionCount >= 5) {
-			             throw new ExcededMaxDelimiter("Limite de 5 entregas atingido para esta atividade!");
-			         }
-		             SubmissionEntity submissionEntity = new SubmissionEntity();
-		             submissionEntity.setProgress(progressEntityCompleted);
-		             try {
-		                 makeUploadAndDownloadArchive.saveArchive(targetArchive, submissionEntity, submissionsRepository);
-		             } catch (IOException e) {
-		                 throw new RuntimeException("Erro ao salvar arquivo: " + targetArchive.getOriginalFilename());
-		             }
-		         });
+		         if(dto.getActivityLinks() !=null && !dto.getActivityLinks().isEmpty()) {
+		        	 dto.getActivityLinks().forEach(targetLink -> {
+				         Long submissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNull(progressEntityCompleted.getProgressId());
+				         if (submissionCount >= 5) {
+				             throw new ExcededMaxDelimiter("Limite de 10 entregas atingido para esta atividade!");
+				         }
+			             SubmissionEntity submissionEntity = new SubmissionEntity();
+			             submissionEntity.setProgress(progressEntityCompleted);
+			             try {
+			            
+			            	 submissionEntity.setSubmissionLink(targetLink);
+			            	 submissionsRepository.save(submissionEntity);
+			             } catch (Exception e) {
+			                 throw new RuntimeException("Erro ao salvar arquivo: " + targetLink);
+			             }
+			         });
+		         }
+		        
 		         
 
 		         
-		         return null;
+		         return ResponseEntity.ok("aaaaaaaaa");
 	      }
 	     ActivityProgressEntity progressEntity = progressRepository.findByUserTrailAndActivity(userId, trailId, progressMinePerStatus)
 	             .orElseThrow(() -> new EntityNotFoundException("Progresso não identificado linha"));
@@ -268,10 +282,11 @@ public class ProgressActivityService {
 	             //////////////////////////////////////// ActivityId + = """ + progressEntity.getActivity().getActivityId());
 
 	     if (progressEntity.getActivityStatus() == StatusOfLife.ENABLE && progressEntity.getUser().getUserRole() == UserRoleEnum.ALUNO) {
-	         // Verificar limite de 5 submissões
-	         Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressEntity.getProgressId());
-	         if (submissionCount >= 5) {
-	             throw new IllegalStateException("Limite de 5 entregas atingido para esta atividade!");
+
+	    	 Long submissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNotNull(progressEntity.getProgressId());
+	    	 Long submittedArchives = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNull(progressEntity.getProgressId());
+	         if (submissionCount >= 5 && submittedArchives >=5) {
+	             throw new IllegalStateException("Limite de 10 entregues atingido para esta atividade!");
 	         }
 
 	         progressEntity.setActivityStatus(StatusOfLife.COMPLETE);
@@ -351,12 +366,17 @@ public class ProgressActivityService {
 	     
 	       
 	        
-	         if (dto.getActivityFiles() == null || dto.getActivityFiles().isEmpty()) {
-	             throw new IllegalArgumentException("Nenhum arquivo enviado!");
-	         }
+	   
 	     
 	         if (progressEntity.getActivityStatus() == StatusOfLife.COMPLETE) {
+	        	 if (dto.getActivityFiles() != null && !dto.getActivityFiles().isEmpty()) {
+	         
 	             dto.getActivityFiles().forEach(targetArchive -> {
+	            	 
+	            	  Long checksubmissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNotNull(progressEntityCompleted.getProgressId());
+				         if (checksubmissionCount >= 5) {
+				             throw new ExcededMaxDelimiter("Limite de 5 entregas atingido para esta atividade!");
+				         }
 	                 SubmissionEntity submissionEntity = new SubmissionEntity();
 	                 submissionEntity.setProgress(progressEntity);
 	                 try {
@@ -364,7 +384,29 @@ public class ProgressActivityService {
 	                 } catch (IOException e) {
 	                     throw new RuntimeException("Erro ao salvar arquivo: " + targetArchive.getOriginalFilename());
 	                 }
-	             });
+	             
+	             });}
+	        	 System.err.println("TESTETEETETETETETETETETET ->");
+	        	  System.out.println("NÃO ENTROU AINDAAAAA - DEBUG ! :" + dto.getActivityLinks());
+	        	 if (dto.getActivityLinks() != null && !dto.getActivityLinks().isEmpty()) {
+	    	         System.out.println("ENTROUUUUU PARA ENTREGAR O LINKKKKKKKKKKK!");
+		             dto.getActivityLinks().forEach(targetLink -> {
+		            	 
+		            	  Long checksubmissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNull(progressEntityCompleted.getProgressId());
+					         if (checksubmissionCount >= 5) {
+					             throw new ExcededMaxDelimiter("Limite de 5 entregas atingido para esta atividade!");
+					         }
+		                 SubmissionEntity submissionEntity = new SubmissionEntity();
+		                 submissionEntity.setProgress(progressEntity);
+		                 try {
+		                	
+		                	 submissionEntity.setSubmissionLink(targetLink);
+			            	 submissionsRepository.save(submissionEntity);
+		                 } catch (Exception e) {
+		                     throw new RuntimeException("Erro ao salvar arquivo: " + targetLink);
+		                 }
+		             
+		             });}
 	             Long progressMinePerStatusDisable= progressRepository.findMinActivityIdPerStatus(userId, trailId,(long) 1) ;
 	             if(progressMinePerStatusDisable == null) {
 	            	 return null;

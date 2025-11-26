@@ -8,5 +8,6 @@ public interface SubmissionArchivesForTeacherProjection {
      Long getUserId();
      String getUserName();
      String getUserArchiveName();
+     String getSubmissionLink();
 
 }

@@ -57,7 +57,7 @@ public class SubmissionService {
 	public List<ProgressSubmitActivityDTO> ListenerOfDowloadableArchivesSubmitedService(Long progressId){
 		return submissionsRepository.findArchivesForDownloadAcessPerProgressId(progressId)
 				.stream()
-				.map(tbs-> mapper.submittedToDTO(tbs))
+				.map(tbs->mapper.submittedToDTO(tbs))
 				.collect(Collectors.toList());
 	}
 	
@@ -82,16 +82,19 @@ public class SubmissionService {
     }
 	@Transactional
 	public Boolean deleteSubmission(Long submissionId,Long progressId) {
-	     Long submissionCount = submissionsRepository.countSubmissionsByProgressId(progressId);
-	     if(submissionCount<2) {
-	    	 throw new ExcededMaxDelimiter("*Ops!, Deve existir pelo menos um arquivo entregue!");
+	     Long submissionCount = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNotNull(progressId);
+	     Long submissionLinks = submissionsRepository.countByProgress_ProgressIdAndArchiveNameIsNull(progressId);
+	     if(submissionCount<2 && submissionLinks<2) {
+	    	 throw new ExcededMaxDelimiter("*Ops!, minimo de itens devem existir!");
 	     }
 		SubmissionEntity submissionEntity = submissionsRepository.findById(submissionId)
 				.orElseThrow(()-> new SoftNotFoundException("Entrega não identificada!") );
    
 		
 		try {
+			if(submissionEntity.getArchiveName()!=null && !submissionEntity.getArchiveName().isEmpty()) {
 			makeUploadAndDownloadArchive.deleteFile(submissionEntity.getArchiveName());
+			}
 			submissionsRepository.delete(submissionEntity);
 		}catch(IOException e) {
 			throw new SoftNotFoundException(e.getMessage());

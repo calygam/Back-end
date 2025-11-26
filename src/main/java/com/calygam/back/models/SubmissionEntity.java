@@ -30,6 +30,9 @@ public class SubmissionEntity implements GenericFileManagement {
 	@Column(name="submission_archive_type")
 	private String archiveType;
 	
+	@Column(name="submission_link")
+	private String submissionLink;
+	
 	@ManyToOne
 	@JoinColumn(name="progressId")
 	private ActivityProgressEntity progress;
@@ -83,6 +86,18 @@ public class SubmissionEntity implements GenericFileManagement {
 	public void setProgress(ActivityProgressEntity progress) {
 		this.progress = progress;
 	}
+
+	public String getSubmissionLink() {
+		return submissionLink;
+	}
+
+	public void setSubmissionLink(String submissionLink) {
+		this.submissionLink = submissionLink;
+	}
+
+
+	
+	
 	
 	
 	

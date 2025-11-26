@@ -6,4 +6,5 @@ public interface SubmissionArchivesProjection {
     String getArchiveName();
     String getOriginalName();
     Long getSubmissionId();
+    String getSubmisionLink();
 }

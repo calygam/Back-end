@@ -20,6 +20,11 @@ public class ProgressSubmitActivityDTO {
 	
 	@JsonInclude(JsonInclude.Include.NON_NULL)
 	private String activityOriginalFileName;
+	
+	private List<String> activityLinks;
+	
+	private String activityLink;
+	
 
 
 	public ProgressSubmitActivityDTO() {
@@ -27,12 +32,13 @@ public class ProgressSubmitActivityDTO {
 	}
 
 	
-
 	
-	public ProgressSubmitActivityDTO(List<MultipartFile> activityFiles, String activitySubmitedFile) {
+	
+	public ProgressSubmitActivityDTO(List<MultipartFile> activityFiles, String activitySubmitedFile,List<String> activityLinks){
 		super();
 		this.activityFiles = activityFiles;
 		this.activitySubmitedFile = activitySubmitedFile;
+		this.activityLinks = activityLinks;
 	}
 
 
@@ -51,6 +57,20 @@ public class ProgressSubmitActivityDTO {
 
 
 
+
+
+
+
+	public List<String> getActivityLinks() {
+		return activityLinks;
+	}
+
+
+
+
+	public void setActivityLinks(List<String> activityLinks) {
+		this.activityLinks = activityLinks;
+	}
 
 
 
@@ -105,6 +125,22 @@ public class ProgressSubmitActivityDTO {
 	public void setSubmissionId(Long submissionId) {
 		this.submissionId = submissionId;
 	}
+
+
+
+
+	public String getActivityLink() {
+		return activityLink;
+	}
+
+
+
+
+	public void setActivityLink(String activityLink) {
+		this.activityLink = activityLink;
+	}
+	
+	
 	
 	
 	

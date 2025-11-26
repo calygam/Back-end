@@ -18,7 +18,8 @@ public interface SubmissionsRepository extends JpaRepository<SubmissionEntity, L
 	        SELECT 
 	        tbs.submission_archive_name AS archiveName,
 	        tbs.submission_original_name AS originalName,
-	        tbs.submission_id AS submissionId 
+	        tbs.submission_id AS submissionId ,
+	        tbs.submission_link AS submisionLink
 	        FROM tb_submission tbs 
 	        WHERE tbs.progress_id = :progressId
 	        """, nativeQuery = true)
@@ -46,7 +47,8 @@ public interface SubmissionsRepository extends JpaRepository<SubmissionEntity, L
 		        tbs.submissionId AS submissionId,
 		        tbpu.userId AS userId,
 		        tbpu.userName AS userName,
-		        tbpu.archiveName AS userArchiveName
+		        tbpu.archiveName AS userArchiveName,
+		        tbs.submissionLink AS submissionLink
 		    FROM SubmissionEntity tbs
 		    JOIN tbs.progress tbp
 		    JOIN tbp.user tbpu
@@ -63,8 +65,7 @@ public interface SubmissionsRepository extends JpaRepository<SubmissionEntity, L
 	@Query("SELECT s FROM SubmissionEntity s WHERE s.originalName = :originalName")
 	Optional<SubmissionEntity> findByOriginalName(@Param("originalName") String originalName);
 	
-	@Query(value = """
-		    SELECT COUNT(*) FROM tb_submission s WHERE s.progress_id = :progressId
-		    """, nativeQuery = true)
-		Long countSubmissionsByProgressId(@Param("progressId") Long progressId);
+	
+	Long countByProgress_ProgressIdAndArchiveNameIsNotNull(Long progressId);
+	Long countByProgress_ProgressIdAndArchiveNameIsNull(Long progressId);
 }

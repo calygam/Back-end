@@ -4,6 +4,7 @@ public class SubmissionsDTO {
 	  private String submissionArchiveUrl;
 	  private String submissionOriginalName;
 	  private Long 	submissionId;
+	  private String submissionLink;
 	public SubmissionsDTO() {
 		super();
 	}
@@ -30,6 +31,12 @@ public class SubmissionsDTO {
 	}
 	public void setSubmissionId(Long submissionId) {
 		this.submissionId = submissionId;
+	}
+	public String getSubmissionLink() {
+		return submissionLink;
+	}
+	public void setSubmissionLink(String submissionLink) {
+		this.submissionLink = submissionLink;
 	}
 	  
 	  
